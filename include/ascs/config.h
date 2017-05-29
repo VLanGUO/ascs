@@ -129,6 +129,7 @@
  * Drop ASCS_HAS_STD_SHARED_MUTEX macro.
  * Drop ASCS_DISCARD_MSG_WHEN_LINK_DOWN macro and related logic, because it brings complexity and race condition,
  *  and are not very useful.
+ * Drop socket::is_closable, tcp::connector_base will overwrite socket::on_close to implement reconnecting mechanism.
  * Not support pausing message sending and dispatching any more, because they bring complexity and race condition,
  *  and are not very useful.
  *
