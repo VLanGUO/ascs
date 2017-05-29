@@ -112,6 +112,7 @@
  * Before on_close() to be called, socket::start becomes available (so user can call it falsely).
  * If a timer failed or stopped by callback, its status not set properly (should be set to TIMER_CANCELED).
  * Make ssl shutting down thread safe.
+ * Make reconnecting after all async invocations (like object reusing or restoration).
  *
  * ENHANCEMENTS:
  * Virtual function i_packer::pack_heartbeat been introduced to support heartbeat function.
