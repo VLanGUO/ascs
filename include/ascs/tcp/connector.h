@@ -133,16 +133,7 @@ protected:
 	}
 
 	//reconnect at here rather than in on_recv_error to make sure that there's no any async invocations performed on this socket before reconnectiong
-	virtual void on_close()
-	{
-		if (!need_reconnect)
-			super::on_close();
-		else
-		{
-			this->stop_all_timer();
-			this->start();
-		}
-	}
+	virtual void on_close() {if (need_reconnect) this->start(); else super::on_close();}
 
 	bool prepare_next_reconnect(const asio::error_code& ec)
 	{
