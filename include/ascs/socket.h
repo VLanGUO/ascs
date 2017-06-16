@@ -254,7 +254,7 @@ protected:
 		}
 
 		set_async_calling(true);
-		set_timer(TIMER_DELAY_CLOSE, ASCS_DELAY_CLOSE * 1000 + 50, [this](tid id)->bool {return this->timer_handler(id);});
+		set_timer(TIMER_DELAY_CLOSE, ASCS_DELAY_CLOSE * 1000 + 50, [this](tid id)->bool {return this->timer_handler(TIMER_DELAY_CLOSE);});
 
 		return true;
 	}
@@ -289,7 +289,7 @@ protected:
 		else
 		{
 			recv_idle_begin_time = statistic::now();
-			set_timer(TIMER_HANDLE_MSG, 50, [this](tid id)->bool {return this->timer_handler(id);});
+			set_timer(TIMER_HANDLE_MSG, 50, [this](tid id)->bool {return this->timer_handler(TIMER_HANDLE_MSG);});
 		}
 	}
 
@@ -368,7 +368,7 @@ private:
 				asio::error_code ec;
 				lowest_layer().close(ec);
 			}
-			change_timer_status(id, timer_info::TIMER_CANCELED);
+			change_timer_status(TIMER_DELAY_CLOSE, timer_info::TIMER_CANCELED);
 			on_close();
 			set_async_calling(false);
 			break;
@@ -392,7 +392,7 @@ private:
 		{
 			last_dispatch_msg.restart(end_time);
 			dispatching = false;
-			set_timer(TIMER_DISPATCH_MSG, 50, [this](tid id)->bool {return this->timer_handler(id);});
+			set_timer(TIMER_DISPATCH_MSG, 50, [this](tid id)->bool {return this->timer_handler(TIMER_DISPATCH_MSG);});
 		}
 		else //dispatch msg in sequence
 		{
