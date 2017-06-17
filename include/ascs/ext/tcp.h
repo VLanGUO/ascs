@@ -1,5 +1,5 @@
 /*
- * client.h
+ * tcp.h
  *
  *  Created on: 2016-7-30
  *      Author: youngwolf
@@ -7,11 +7,11 @@
  *		QQ: 676218192
  *		Community on QQ: 198941541
  *
- * client related conveniences.
+ * TCP related conveniences.
  */
 
-#ifndef _ASCS_EXT_CLIENT_H_
-#define _ASCS_EXT_CLIENT_H_
+#ifndef _ASCS_EXT_TCP_H_
+#define _ASCS_EXT_TCP_H_
 
 #include "packer.h"
 #include "unpacker.h"
@@ -40,4 +40,4 @@ typedef ascs::tcp::server_base<server_socket> server;
 
 }}} //namespace
 
-#endif /* _ASCS_EXT_CLIENT_H_ */
+#endif /* _ASCS_EXT_TCP_H_ */

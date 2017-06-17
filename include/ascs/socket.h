@@ -134,7 +134,7 @@ public:
 	{
 		assert(interval > 0 && max_absence > 0);
 
-		if (is_ready() && last_recv_time > 0) //check of last_recv_time is essential, because user may call check_heartbeat before do_start
+		if (last_recv_time > 0 && is_ready()) //check of last_recv_time is essential, because user may call check_heartbeat before do_start
 		{
 			auto now = time(nullptr);
 			if (now - last_recv_time >= interval * max_absence)
@@ -194,8 +194,7 @@ protected:
 
 	//generally, you don't have to rewrite this to maintain the status of connections(TCP)
 	virtual void on_send_error(const asio::error_code& ec) {unified_out::error_out("send msg error (%d %s)", ec.value(), ec.message().data());}
-	//receiving error or peer endpoint quit(false ec means ok)
-	virtual void on_recv_error(const asio::error_code& ec) = 0;
+	virtual void on_recv_error(const asio::error_code& ec) = 0; //receiving error or peer endpoint quit(false ec means ok)
 	virtual bool on_heartbeat_error() = 0; //heartbeat timed out, return true to continue heartbeat function (useful for UDP)
 
 	//if ASCS_DELAY_CLOSE is equal to zero, in this callback, socket guarantee that there's no any other async call associated it,
