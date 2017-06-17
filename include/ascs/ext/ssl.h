@@ -28,6 +28,7 @@
 namespace ascs { namespace ext { namespace ssl {
 
 typedef ascs::ssl::client_socket_base<ASCS_DEFAULT_PACKER, ASCS_DEFAULT_UNPACKER> client_socket;
+typedef client_socket connector;
 typedef ascs::ssl::single_client_base<client_socket> single_client;
 typedef ascs::ssl::client_base<client_socket> client;
 
