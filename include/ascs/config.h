@@ -153,6 +153,7 @@
  * HIGHLIGHT:
  *
  * FIX:
+ * Fix race condition on member variable last_send_msg in tcp::socket_base.
  *
  * ENHANCEMENTS:
  * Optimize reconnecting mechanism.
