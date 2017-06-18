@@ -283,9 +283,10 @@ private:
 		}
 		else
 		{
-			this->sending = false;
 			this->on_send_error(ec);
 			last_send_msg.clear(); //clear sending messages after on_send_error, then user can decide how to deal with them in on_send_error
+
+			this->sending = false; //must after the erasure of last_send_msg to avoid race condition
 		}
 	}
 
