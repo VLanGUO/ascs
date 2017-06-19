@@ -146,7 +146,7 @@
  * Move directory include/ascs/ssl into directory include/ascs/tcp/, because ssl is based on ascs::tcp.
  *
  * ===============================================================
- * 2017.x.x			version 1.2.1
+ * 2017.6.19		version 1.2.1
  *
  * SPECIAL ATTENTION (incompatible with old editions):
  *
