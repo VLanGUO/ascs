@@ -43,7 +43,11 @@ public:
 	bool set_server_addr(unsigned short port, const std::string& ip = ASCS_SERVER_IP)
 	{
 		asio::error_code ec;
+#if ASIO_VERSION >= 101100
+		auto addr = asio::ip::make_address(ip, ec);
+#else
 		auto addr = asio::ip::address::from_string(ip, ec);
+#endif
 		if (ec)
 			return false;
 

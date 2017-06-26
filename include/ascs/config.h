@@ -31,7 +31,7 @@
  *
  * 2016.10.8	version 1.1.0
  * Support concurrent queue (https://github.com/cameron314/concurrentqueue), it's lock-free.
- * Define ASCS_USE_CONCURRENT_QUEUE macro to use your personal message queue. 
+ * Define ASCS_USE_CONCURRENT_QUEUE macro to use your personal message queue.
  * Define ASCS_USE_CONCURRE macro to use concurrent queue, otherwise ascs::list will be used as the message queue.
  * Drop original congestion control (because it cannot totally resolve dead loop) and add a semi-automatic congestion control.
  * Demonstrate how to use the new semi-automatic congestion control (echo_server, echo_client, pingpong_server and pingpong_client).
@@ -90,7 +90,7 @@
  * Fix bug: Sometimes, connector_base cannot reconnect to the server after link broken.
  *
  * ===============================================================
- * 2017.5.30		version 1.2.0
+ * 2017.5.30	version 1.2.0
  *
  * SPECIAL ATTENTION (incompatible with old editions):
  * Virtual function reset_state in i_packer and i_unpacker have been renamed to reset.
@@ -146,7 +146,7 @@
  * Move directory include/ascs/ssl into directory include/ascs/tcp/, because ssl is based on ascs::tcp.
  *
  * ===============================================================
- * 2017.6.19		version 1.2.1
+ * 2017.6.19	version 1.2.1
  *
  * SPECIAL ATTENTION (incompatible with old editions):
  *
@@ -166,6 +166,26 @@
  * REPLACEMENTS:
  * Rename connector_base and ssl::connector_base to client_socket_base and ssl::client_socket_base, the former is still available, but is just an alias.
  *
+ * ===============================================================
+ * 2017.x.x		version 1.2.2
+ *
+ * SPECIAL ATTENTION (incompatible with old editions):
+ * No error_code will be presented anymore when call io_service::run, suggest to define macro ASCS_ENHANCED_STABILITY.
+ *
+ * HIGHLIGHT:
+ *
+ * FIX:
+ *
+ * ENHANCEMENTS:
+ * Truly support asio 1.11 (don't use deprecated functions and classes any more), and of course, asio 1.10 will be supported too.
+ *
+ * DELETION:
+ *
+ * REFACTORING:
+ *
+ * REPLACEMENTS:
+ * Use mutable_buffer and const_buffer instead of mutable_buffers_1 and const_buffers_1 if possible, this can gain some performance improvement.
+ *
  */
 
 #ifndef _ASCS_CONFIG_H_
@@ -175,8 +195,8 @@
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#define ASCS_VER		10201	//[x]xyyzz -> [x]x.[y]y.[z]z
-#define ASCS_VERSION	"1.2.1"
+#define ASCS_VER		10202	//[x]xyyzz -> [x]x.[y]y.[z]z
+#define ASCS_VERSION	"1.2.2"
 
 //asio and compiler check
 #ifdef _MSC_VER
@@ -211,6 +231,10 @@
 #endif
 
 static_assert(ASIO_VERSION >= 101001, "ascs needs asio 1.10.1 or higher.");
+
+#if ASIO_VERSION >= 101100 && defined(ASIO_NO_DEPRECATED)
+#define io_service io_context
+#endif
 //asio and compiler check
 
 //configurations
@@ -397,7 +421,20 @@ static_assert(ASCS_ASYNC_ACCEPT_NUM > 0, "async accept number must be bigger tha
 
 //buffer type used when receiving messages (unpacker's prepare_next_recv() need to return this type)
 #ifndef ASCS_RECV_BUFFER_TYPE
-#define ASCS_RECV_BUFFER_TYPE asio::mutable_buffers_1
+	#if ASIO_VERSION >= 101100
+	#define ASCS_RECV_BUFFER_TYPE asio::mutable_buffer
+	#else
+	#define ASCS_RECV_BUFFER_TYPE asio::mutable_buffers_1
+	#endif
+#endif
+
+#ifdef ASCS_SEND_BUFFER_TYPE
+	#error macro ASCS_SEND_BUFFER_TYPE is just used internally.
+#endif
+#if ASIO_VERSION >= 101100
+#define ASCS_SEND_BUFFER_TYPE asio::const_buffer
+#else
+#define ASCS_SEND_BUFFER_TYPE asio::const_buffers_1
 #endif
 
 #ifndef ASCS_HEARTBEAT_INTERVAL

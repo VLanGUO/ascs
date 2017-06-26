@@ -32,7 +32,11 @@ public:
 		else
 		{
 			asio::error_code ec;
+#if ASIO_VERSION >= 101100
+		auto addr = asio::ip::make_address(ip, ec);
+#else
 			auto addr = asio::ip::address::from_string(ip, ec);
+#endif
 			if (ec)
 				return false;
 
@@ -114,7 +118,11 @@ protected:
 #endif
 		acceptor.bind(server_addr, ec); assert(!ec);
 		if (ec) {get_service_pump().stop(); unified_out::error_out("bind failed."); return false;}
+#if ASIO_VERSION >= 101100
+		acceptor.listen(asio::ip::tcp::acceptor::max_listen_connections, ec); assert(!ec);
+#else
 		acceptor.listen(asio::ip::tcp::acceptor::max_connections, ec); assert(!ec);
+#endif
 		if (ec) {get_service_pump().stop(); unified_out::error_out("listen failed."); return false;}
 
 		this->start();
