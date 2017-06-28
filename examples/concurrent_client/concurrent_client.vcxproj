@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{87EC805D-5641-42D7-8D94-5EB0F85C07A3}</ProjectGuid>
+    <ProjectGuid>{73FC699C-3E7C-4FE6-8E03-06A730035955}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>concurrent_client</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>

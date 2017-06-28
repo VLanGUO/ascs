@@ -19,7 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{5F5E8BA8-A8E1-4FEF-AF37-719BDA50136E}</ProjectGuid>
+    <ProjectGuid>{827343A9-D15E-4070-909D-2DFCC7CA8574}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>concurrent_server</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
@@ -155,6 +155,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="concurrent_server.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="unpacker.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

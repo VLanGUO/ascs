@@ -2,15 +2,15 @@
 #include <iostream>
 
 //configuration
-#define ASCS_SERVER_PORT	9527
-#define ASCS_MAX_OBJECT_NUM	102400
+#define ASCS_SERVER_PORT		9527
+#define ASCS_MAX_OBJECT_NUM		102400
 #define ASCS_REUSE_OBJECT //use objects pool
-#define ASCS_DELAY_CLOSE	5 //define this to avoid hooks for async call (and slightly improve efficiency)
+#define ASCS_DELAY_CLOSE		5 //define this to avoid hooks for async call (and slightly improve efficiency)
 //#define ASCS_FORCE_TO_USE_MSG_RECV_BUFFER
-#define ASCS_INPUT_QUEUE non_lock_queue //we will never operate sending buffer concurrently, so need no locks
-#define ASCS_INPUT_CONTAINER list
-#define ASCS_DEFAULT_PACKER dummy_packer<basic_buffer>
-#define ASCS_DEFAULT_UNPACKER echo_unpacker
+#define ASCS_INPUT_QUEUE		non_lock_queue //we will never operate sending buffer concurrently, so need no locks
+#define ASCS_INPUT_CONTAINER	list
+#define ASCS_DEFAULT_PACKER		dummy_packer<basic_buffer>
+#define ASCS_DEFAULT_UNPACKER	echo_unpacker
 //configuration
 
 #include "../concurrent_server/unpacker.h"
