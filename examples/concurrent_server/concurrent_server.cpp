@@ -30,12 +30,10 @@ public:
 
 protected:
 	//msg handling: send the original msg back(echo server)
-#ifndef ASCS_FORCE_TO_USE_MSG_RECV_BUFFER //this virtual function doesn't exists if ASCS_FORCE_TO_USE_MSG_RECV_BUFFER been defined
+#ifndef ASCS_FORCE_TO_USE_MSG_RECV_BUFFER //this virtual function doesn't exist if ASCS_FORCE_TO_USE_MSG_RECV_BUFFER been defined
 	virtual bool on_msg(out_msg_type& msg) {direct_send_msg(std::move(msg), true); return true;}
-	virtual bool on_msg_handle(out_msg_type& msg) {direct_send_msg(std::move(msg), true); return true;}
-#else
-	virtual bool on_msg_handle(out_msg_type& msg) {direct_send_msg(std::move(msg), true); return true;}
 #endif
+	virtual bool on_msg_handle(out_msg_type& msg) {direct_send_msg(std::move(msg), true); return true;}
 	//msg handling end
 };
 

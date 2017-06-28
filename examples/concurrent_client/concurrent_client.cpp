@@ -40,7 +40,11 @@ protected:
 		in_msg_type msg;
 		msg.assign(4 + msg_len);
 
+#ifdef _MSC_VER
+		sprintf(msg.data(), "%04Iu", msg_len);
+#else
 		sprintf(msg.data(), "%04zu", msg_len);
+#endif
 		memset(msg.data() + 4, 'Y', msg_len);
 
 		last_send_time.restart();
@@ -129,8 +133,6 @@ int main(int argc, const char* argv[])
 	for (size_t i = 0; i < link_num; ++i)
 		client.add_socket(port, ip);
 
-	sp.start_service(thread_num);
-
 	auto max_delay = 1.f;
 	if (argc > 2)
 		max_delay = std::max(.1f, (float) atof(argv[2]));
@@ -140,6 +142,7 @@ int main(int argc, const char* argv[])
 		msg_len = std::max(1, std::min(msg_len, atoi(argv[1])));
 	client.begin(max_delay, msg_len);
 
+	sp.start_service(thread_num);
 	while(sp.is_running())
 	{
 		std::string str;

@@ -173,6 +173,7 @@
  * No error_code will be presented anymore when call io_service::run, suggest to define macro ASCS_ENHANCED_STABILITY.
  *
  * HIGHLIGHT:
+ * Add two demos for concurrent test.
  *
  * FIX:
  *

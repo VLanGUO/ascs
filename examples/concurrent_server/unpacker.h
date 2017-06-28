@@ -1,10 +1,10 @@
 #ifndef UNPACKER_H_
 #define UNPACKER_H_
 
-#define MSG_MAX_LEN		(4 + 512)
-
 #include <ascs/ext/ext.h>
 using namespace ascs::ext;
+
+#define MSG_MAX_LEN		(4 + 512)
 
 //head (4 bytes, readable) + body, not stripped, cannot exceed MSG_MAX_LEN
 class echo_unpacker : public ascs::tcp::i_unpacker<basic_buffer>
@@ -19,9 +19,16 @@ public:
 		auto ok = bytes_transferred == raw_buff.size();
 		if (!ok && raw_buff.empty() && bytes_transferred == raw_buff.buffer_size())
 		{
-			int len;
-			sscanf(raw_buff.data(), "%04d", &len);
-			if ((size_t) (len + 4) == raw_buff.buffer_size())
+			assert(bytes_transferred > 4);
+
+			size_t len;
+#ifdef _MSC_VER
+			sscanf(raw_buff.data(), "%04Iu", &len);
+#else
+			sscanf(raw_buff.data(), "%04zu", &len);
+#endif
+			assert(len + 4 == raw_buff.buffer_size());
+			if (len + 4 == raw_buff.buffer_size())
 			{
 				ok = true;
 				raw_buff.size(bytes_transferred);
@@ -49,17 +56,17 @@ public:
 				if (bytes_transferred < 4)
 					return asio::detail::default_max_transfer_size;
 
-				int len;
-				sscanf(raw_buff.data(), "%04d", &len);
-				assert((size_t) (len + 4) <= raw_buff.buffer_size());
-
-				if ((size_t) (len + 4) > raw_buff.buffer_size())
-				{
-					assert(false);
-					return 0;
-				}
-				else
+				size_t len;
+#ifdef _MSC_VER
+				sscanf(raw_buff.data(), "%04Iu", &len);
+#else
+				sscanf(raw_buff.data(), "%04zu", &len);
+#endif
+				assert(len + 4 <= raw_buff.buffer_size());
+				if (len + 4 <= raw_buff.buffer_size())
 					raw_buff.size(4 + len);
+				else
+					return 0;
 			}
 
 			if (bytes_transferred < raw_buff.size())
