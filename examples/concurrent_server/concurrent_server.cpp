@@ -7,13 +7,10 @@
 #define ASCS_REUSE_OBJECT //use objects pool
 #define ASCS_DELAY_CLOSE		5 //define this to avoid hooks for async call (and slightly improve efficiency)
 //#define ASCS_FORCE_TO_USE_MSG_RECV_BUFFER
-#define ASCS_INPUT_QUEUE		non_lock_queue
+#define ASCS_MSG_BUFFER_SIZE	1024
+#define ASCS_INPUT_QUEUE		non_lock_queue //we will never operate sending buffer concurrently, so need no locks
 #define ASCS_INPUT_CONTAINER	list
-#define ASCS_DEFAULT_PACKER		dummy_packer<basic_buffer>
-#define ASCS_DEFAULT_UNPACKER	echo_unpacker
 //configuration
-
-#include "unpacker.h"
 
 #include <ascs/ext/tcp.h>
 using namespace ascs;
@@ -26,7 +23,7 @@ using namespace ascs::ext::tcp;
 class echo_socket : public server_socket
 {
 public:
-	echo_socket(i_server& server_) : server_socket(server_) {}
+	echo_socket(i_server& server_) : server_socket(server_) {unpacker()->stripped(false);}
 
 protected:
 	//msg handling: send the original msg back(echo server)

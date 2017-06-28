@@ -7,17 +7,15 @@
 #define ASCS_REUSE_OBJECT //use objects pool
 #define ASCS_DELAY_CLOSE		5 //define this to avoid hooks for async call (and slightly improve efficiency)
 //#define ASCS_FORCE_TO_USE_MSG_RECV_BUFFER
+#define ASCS_MSG_BUFFER_SIZE	1024
 #define ASCS_INPUT_QUEUE		non_lock_queue //we will never operate sending buffer concurrently, so need no locks
 #define ASCS_INPUT_CONTAINER	list
-#define ASCS_DEFAULT_PACKER		dummy_packer<basic_buffer>
-#define ASCS_DEFAULT_UNPACKER	echo_unpacker
 //configuration
-
-#include "../concurrent_server/unpacker.h"
 
 #include <ascs/ext/tcp.h>
 using namespace ascs;
 using namespace ascs::tcp;
+using namespace ascs::ext;
 using namespace ascs::ext::tcp;
 
 #define QUIT_COMMAND	"quit"
@@ -26,7 +24,7 @@ using namespace ascs::ext::tcp;
 class echo_socket : public client_socket
 {
 public:
-	echo_socket(asio::io_service& io_service_) : client_socket(io_service_), msg_len(MSG_MAX_LEN - 4), time_elapsed(-1.f) {}
+	echo_socket(asio::io_service& io_service_) : client_socket(io_service_), msg_len(ASCS_MSG_BUFFER_SIZE - ASCS_HEAD_LEN), time_elapsed(-1.f) {unpacker()->stripped(false);}
 
 	void begin(size_t msg_len_) {msg_len = msg_len_;}
 	void check_delay(float max_delay) {if (time_elapsed > max_delay) force_shutdown();}
@@ -37,18 +35,11 @@ protected:
 		asio::ip::tcp::no_delay option(true);
 		lowest_layer().set_option(option);
 
-		in_msg_type msg;
-		msg.assign(4 + msg_len);
-
-#ifdef _MSC_VER
-		sprintf(msg.data(), "%04Iu", msg_len);
-#else
-		sprintf(msg.data(), "%04zu", msg_len);
-#endif
-		memset(msg.data() + 4, 'Y', msg_len);
+		char* buff = new char[msg_len];
+		memset(buff, 'Y', msg_len); //what should we send?
 
 		last_send_time.restart();
-		direct_send_msg(std::move(msg), true);
+		send_msg(buff, msg_len, true);
 
 		client_socket::on_connect();
 	}
@@ -100,8 +91,8 @@ public:
 
 int main(int argc, const char* argv[])
 {
-	printf("usage: %s [<message size=%d> [<max delay=%f (seconds)> [<service thread number=1> [<port=%d> [<ip=%s> [link num=16]]]]]]\n",
-		argv[0], MSG_MAX_LEN - 4, 1.f, ASCS_SERVER_PORT, ASCS_SERVER_IP);
+	printf("usage: %s [<message size=" ASCS_SF "> [<max delay=%f (seconds)> [<service thread number=1> [<port=%d> [<ip=%s> [link num=16]]]]]]\n",
+		argv[0], ASCS_MSG_BUFFER_SIZE - ASCS_HEAD_LEN, 1.f, ASCS_SERVER_PORT, ASCS_SERVER_IP);
 	if (argc >= 2 && (0 == strcmp(argv[1], "--help") || 0 == strcmp(argv[1], "-h")))
 		return 0;
 	else
@@ -137,9 +128,9 @@ int main(int argc, const char* argv[])
 	if (argc > 2)
 		max_delay = std::max(.1f, (float) atof(argv[2]));
 
-	auto msg_len = MSG_MAX_LEN - 4;
+	auto msg_len = ASCS_MSG_BUFFER_SIZE - ASCS_HEAD_LEN;
 	if (argc > 1)
-		msg_len = std::max(1, std::min(msg_len, atoi(argv[1])));
+		msg_len = std::max((size_t) 1, std::min(msg_len, (size_t) atoi(argv[1])));
 	client.begin(max_delay, msg_len);
 
 	sp.start_service(thread_num);

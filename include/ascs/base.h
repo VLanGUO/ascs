@@ -189,7 +189,11 @@ namespace tcp
 		typedef std::list<msg_type> container_type;
 		typedef ASCS_RECV_BUFFER_TYPE buffer_type;
 
+		bool stripped() const {return _stripped;}
+		void stripped(bool stripped_) {_stripped = stripped_;}
+
 	protected:
+		i_unpacker() : _stripped(true) {}
 		virtual ~i_unpacker() {}
 
 	public:
@@ -198,6 +202,9 @@ namespace tcp
 		virtual bool parse_msg(size_t bytes_transferred, container_type& msg_can) = 0;
 		virtual size_t completion_condition(const asio::error_code& ec, size_t bytes_transferred) = 0;
 		virtual buffer_type prepare_next_recv() = 0;
+
+	private:
+		bool _stripped;
 	};
 } //namespace
 

@@ -41,7 +41,10 @@ public:
 					unpack_ok = false;
 				else if (remain_len >= cur_msg_len) //one msg received
 				{
-					msg_can.emplace_back(std::next(pnext, ASCS_HEAD_LEN), cur_msg_len - ASCS_HEAD_LEN);
+					if (stripped())
+						msg_can.emplace_back(std::next(pnext, ASCS_HEAD_LEN), cur_msg_len - ASCS_HEAD_LEN);
+					else
+						msg_can.emplace_back(pnext, cur_msg_len);
 					remain_len -= cur_msg_len;
 					std::advance(pnext, cur_msg_len);
 					cur_msg_len = -1;
@@ -204,6 +207,7 @@ protected:
 
 //protocol: length + body
 //this unpacker demonstrate how to forbid memory replication while parsing msgs (let asio write msg directly).
+//don't support unstripped messages, please note (you can fix this defect if you like).
 class non_copy_unpacker : public ascs::tcp::i_unpacker<basic_buffer>
 {
 public:
@@ -389,9 +393,10 @@ public:
 		while (0 == peek_msg(remain_len, pnext) && (size_t) -1 != cur_msg_len && 0 != cur_msg_len)
 		{
 			assert(cur_msg_len > min_len);
-			auto msg_len = cur_msg_len - min_len;
-
-			msg_can.emplace_back(std::next(pnext, _prefix.size()), msg_len);
+			if (stripped())
+				msg_can.emplace_back(std::next(pnext, _prefix.size()), cur_msg_len - min_len);
+			else
+				msg_can.emplace_back(pnext, cur_msg_len);;
 			remain_len -= cur_msg_len;
 			std::advance(pnext, cur_msg_len);
 			cur_msg_len = -1;
