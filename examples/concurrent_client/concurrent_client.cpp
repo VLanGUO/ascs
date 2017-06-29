@@ -24,10 +24,10 @@ using namespace ascs::ext::tcp;
 class echo_socket : public client_socket
 {
 public:
-	echo_socket(asio::io_service& io_service_) : client_socket(io_service_), msg_len(ASCS_MSG_BUFFER_SIZE - ASCS_HEAD_LEN), time_elapsed(-1.f) {unpacker()->stripped(false);}
+	echo_socket(asio::io_service& io_service_) : client_socket(io_service_), msg_len(ASCS_MSG_BUFFER_SIZE - ASCS_HEAD_LEN) {unpacker()->stripped(false);}
 
 	void begin(size_t msg_len_) {msg_len = msg_len_;}
-	void check_delay(float max_delay) {if (time_elapsed > max_delay) force_shutdown();}
+	void check_delay(float max_delay) {if (is_connected() && last_send_time.elapsed() > max_delay) force_shutdown();}
 
 protected:
 	virtual void on_connect()
@@ -55,8 +55,6 @@ protected:
 private:
 	void handle_msg(out_msg_type&& msg)
 	{
-		time_elapsed = last_send_time.elapsed();
-
 		last_send_time.restart();
 		direct_send_msg(std::move(msg), true);
 	}
@@ -64,7 +62,6 @@ private:
 private:
 	size_t msg_len;
 	cpu_timer last_send_time;
-	float time_elapsed;
 };
 
 class echo_client : public client_base<echo_socket>
@@ -82,12 +79,8 @@ public:
 
 	void begin(float max_delay, size_t msg_len)
 	{
-		do_something_to_all([=](object_ctype& item) {item->begin(msg_len);});
-
-		set_timer(TIMER_END, 1000, [=](tid id) ->bool {
-			this->do_something_to_all([=](object_ctype& item) {item->check_delay(max_delay);});
-			return true;
-			});
+		do_something_to_all([msg_len](object_ctype& item) {item->begin(msg_len);});
+		set_timer(TIMER_END, 5000, [=](tid id)->bool {this->do_something_to_all([max_delay](object_ctype& item) {item->check_delay(max_delay);}); return true;});
 	}
 };
 
