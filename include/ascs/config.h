@@ -174,6 +174,9 @@
  *
  * HIGHLIGHT:
  * Add two demos for concurrent test.
+ * Support unstripped message (take the default unpacker for example, it will not strip message header in parse_msg), this feature is disabled by default,
+ *  you can call tcp::i_unpacker's void stripped(bool) function to enable it.
+ *  udp::i_unpacker doesn't have this feature, it always and only support unstripped message.
  *
  * FIX:
  *
@@ -186,6 +189,7 @@
  *
  * REPLACEMENTS:
  * Use mutable_buffer and const_buffer instead of mutable_buffers_1 and const_buffers_1 if possible, this can gain some performance improvement.
+ * Call force_shutdown instead of graceful_shutdown in tcp::client_base::uninit().
  *
  */
 

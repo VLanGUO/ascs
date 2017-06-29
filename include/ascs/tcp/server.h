@@ -132,7 +132,7 @@ protected:
 
 		return true;
 	}
-	virtual void uninit() {this->stop(); stop_listen(); force_shutdown();}
+	virtual void uninit() {this->stop(); stop_listen(); force_shutdown();} //if you wanna graceful shutdown, call graceful_shutdown before service_pump::stop_service invocation.
 	virtual bool on_accept(typename Pool::object_ctype& socket_ptr) {return true;}
 
 	//if you want to ignore this error and continue to accept new connections immediately, return true in this virtual function;

@@ -141,10 +141,7 @@ int main(int argc, const char* argv[])
 		std::string str;
 		std::getline(std::cin, str);
 		if (QUIT_COMMAND == str)
-		{
-			client.force_shutdown();
 			sp.stop_service();
-		}
 		else if (LIST_STATUS == str)
 		{
 			printf("link #: " ASCS_SF ", valid links: " ASCS_SF ", invalid links: " ASCS_SF "\n", client.size(), client.valid_size(), client.invalid_object_size());

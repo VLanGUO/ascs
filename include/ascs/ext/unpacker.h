@@ -207,7 +207,7 @@ protected:
 
 //protocol: length + body
 //this unpacker demonstrate how to forbid memory replication while parsing msgs (let asio write msg directly).
-//don't support unstripped messages, please note (you can fix this defect if you like).
+//not support unstripped messages, please note (you can fix this defect if you like).
 class non_copy_unpacker : public ascs::tcp::i_unpacker<basic_buffer>
 {
 public:
