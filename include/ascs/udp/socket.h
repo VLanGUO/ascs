@@ -171,7 +171,7 @@ protected:
 
 	virtual void on_recv_error(const asio::error_code& ec)
 	{
-		if (asio::error::operation_aborted != ec.value())
+		if (asio::error::operation_aborted != ec)
 			unified_out::error_out("recv msg error (%d %s)", ec.value(), ec.message().data());
 	}
 
@@ -221,7 +221,7 @@ private:
 			this->handle_msg();
 		}
 #ifdef _MSC_VER
-		else if (asio::error::connection_refused == ec.value() || asio::error::connection_reset == ec.value())
+		else if (asio::error::connection_refused == ec || asio::error::connection_reset == ec)
 			do_start();
 #endif
 		else

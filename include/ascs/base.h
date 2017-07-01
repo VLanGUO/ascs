@@ -34,6 +34,11 @@
 namespace ascs
 {
 
+#if defined(_MSC_VER) && _MSC_VER < 1900 //terrible VC++
+inline bool operator==(asio::error::basic_errors _Left, const asio::error_code& _Right) {return _Left == _Right.value();}
+inline bool operator!=(asio::error::basic_errors _Left, const asio::error_code& _Right) {return !(_Left == _Right);}
+#endif
+
 class scope_atomic_lock : public asio::detail::noncopyable
 {
 public:

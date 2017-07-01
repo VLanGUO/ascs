@@ -141,7 +141,7 @@ protected:
 	//otherwise, don't rewrite this virtual function or call server_base::on_accept_error() directly after your code.
 	virtual bool on_accept_error(const asio::error_code& ec, typename Pool::object_ctype& socket_ptr)
 	{
-		if (asio::error::operation_aborted != ec.value())
+		if (asio::error::operation_aborted != ec)
 		{
 			unified_out::error_out("failed to accept new connection because of %s, will stop listening.", ec.message().data());
 			stop_listen();
