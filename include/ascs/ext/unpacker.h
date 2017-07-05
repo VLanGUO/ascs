@@ -396,7 +396,7 @@ public:
 			if (stripped())
 				msg_can.emplace_back(std::next(pnext, _prefix.size()), cur_msg_len - min_len);
 			else
-				msg_can.emplace_back(pnext, cur_msg_len);;
+				msg_can.emplace_back(pnext, cur_msg_len);
 			remain_len -= cur_msg_len;
 			std::advance(pnext, cur_msg_len);
 			cur_msg_len = -1;

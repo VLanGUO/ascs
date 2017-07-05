@@ -33,7 +33,7 @@ public:
 		{
 			asio::error_code ec;
 #if ASIO_VERSION >= 101100
-		auto addr = asio::ip::make_address(ip, ec);
+			auto addr = asio::ip::make_address(ip, ec);
 #else
 			auto addr = asio::ip::address::from_string(ip, ec);
 #endif

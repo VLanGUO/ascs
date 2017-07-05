@@ -19,7 +19,7 @@
 
 //the size of the buffer used when receiving msg, must equal to or larger than the biggest msg size,
 //the bigger this buffer is, the more msgs can be received in one time if there are enough msgs buffered in the SOCKET.
-//for unpackers use fixed buffer, every unpacker has a fixed buffer with this size, every tcp::socket has an unpacker,
+//for unpackers who use fixed buffer, every unpacker has a fixed buffer with this size, every tcp::socket has an unpacker,
 //so this size is not the bigger the better, bigger buffers may waste more memory.
 //if you customized the packer and unpacker, the above principle maybe not right anymore, it should depends on your implementations.
 #ifndef ASCS_MSG_BUFFER_SIZE
