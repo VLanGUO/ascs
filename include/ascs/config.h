@@ -167,7 +167,7 @@
  * Rename connector_base and ssl::connector_base to client_socket_base and ssl::client_socket_base, the former is still available, but is just an alias.
  *
  * ===============================================================
- * 2017.x.x		version 1.2.2
+ * 2017.7.9		version 1.2.2
  *
  * SPECIAL ATTENTION (incompatible with old editions):
  * No error_code will be presented anymore when call io_service::run, suggest to define macro ASCS_ENHANCED_STABILITY.
@@ -175,7 +175,7 @@
  * HIGHLIGHT:
  * Add two demos for concurrent test.
  * Support unstripped message (take the default unpacker for example, it will not strip message header in parse_msg), this feature is disabled by default,
- *  you can call tcp::i_unpacker's void stripped(bool) function to enable it.
+ *  you can call i_unpacker's void stripped(bool) function to enable it.
  *  udp::i_unpacker doesn't have this feature, it always and only support unstripped message.
  *
  * FIX:
@@ -268,8 +268,7 @@ static_assert(ASCS_MAX_MSG_NUM > 0, "message capacity must be bigger than zero."
 //don't write any logs.
 //#define ASCS_NO_UNIFIED_OUT
 
-//if defined, service_pump will catch exceptions for asio::io_service::run(), and all function objects in asynchronous calls
-//will be hooked by ascs::object, this can avoid the object been freed during asynchronous call.
+//if defined, service_pump will catch exceptions for asio::io_service::run().
 //#define ASCS_ENHANCED_STABILITY
 
 //if defined, asio::steady_timer will be used in ascs::timer, otherwise, asio::system_timer will be used.
@@ -333,7 +332,7 @@ static_assert(ASCS_MAX_OBJECT_NUM > 0, "object capacity must be bigger than zero
 #endif
 
 //define ASCS_CLEAR_OBJECT_INTERVAL macro to let object_pool to invoke clear_obsoleted_object() automatically and periodically
-//this feature may affect performance with huge number of objects, so re-write tcp::server_socket_base::on_recv_error and invoke object_pool::del_object()
+//this feature may affect performance with huge number of objects, so re-write server_socket_base::on_recv_error and invoke object_pool::del_object()
 //is recommended for long-term connection system, but for short-term connection system, you are recommended to open this feature.
 //you must define this macro as a value, not just define it, the value means the interval, unit is second
 //#define ASCS_CLEAR_OBJECT_INTERVAL		60 //seconds
@@ -342,8 +341,8 @@ static_assert(ASCS_MAX_OBJECT_NUM > 0, "object capacity must be bigger than zero
 #endif
 
 //IO thread number
-//listening, msg sending and receiving, msg handling(on_msg_handle() and on_msg()), all timers(include user timers) and other asynchronous calls(ascs::object::post())
-//will use these threads, so keep big enough, no empirical value I can suggest, you must try to find it out in your own environment
+//listening, msg sending and receiving, msg handling (on_msg_handle() and on_msg()), all timers(include user timers) and other asynchronous calls (object::post())
+//keep big enough, no empirical value I can suggest, you must try to find it out in your own environment
 #ifndef ASCS_SERVICE_THREAD_NUM
 #define ASCS_SERVICE_THREAD_NUM	8
 #endif
@@ -356,7 +355,7 @@ static_assert(ASCS_SERVICE_THREAD_NUM > 0, "service thread number be bigger than
 static_assert(ASCS_GRACEFUL_SHUTDOWN_MAX_DURATION > 0, "graceful shutdown duration must be bigger than zero.");
 
 //if connecting (or reconnecting) failed, delay how much milliseconds before reconnecting, negative value means stop reconnecting,
-//you can also rewrite ascs::tcp::client_socket_base::prepare_reconnect(), and return a negative value.
+//you can also rewrite tcp::client_socket_base::prepare_reconnect(), and return a negative value.
 #ifndef ASCS_RECONNECT_INTERVAL
 #define ASCS_RECONNECT_INTERVAL	500 //millisecond(s)
 #endif
@@ -459,9 +458,9 @@ static_assert(ASCS_HEARTBEAT_MAX_ABSENCE > 0, "heartbeat absence must be bigger 
 
 //#define ASCS_REUSE_SSL_STREAM
 //if you need ssl::client_socket_base to be able to reconnect the server, or to open object pool in ssl::object_pool, you must define this macro.
-//i tried many ways, onle one way can make asio::ssl::stream reusable, which is:
+//I tried many ways, onle one way can make asio::ssl::stream reusable, which is:
 // don't call any shutdown functions of asio::ssl::stream, just call asio::ip::tcp::socket's shutdown function,
-// this seems not a normal procedure, but it works, i believe that asio's defect caused this problem.
+// this seems not a normal procedure, but it works, I believe that asio's defect caused this problem.
 //configurations
 
 #endif /* _ASCS_CONFIG_H_ */

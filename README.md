@@ -18,9 +18,9 @@ Derive your own socket from `server_socket_base`, you must at least re-write the
 Create a `service_pump` object, create a `server_base` object, call `service_pump::start_service`;</br>
 Call `server_socket_base::send_msg` when you have messages need to send.</br>
 ###client:
-Derive your own socket from `connector_base`, you must at least re-write the `on_msg` or `on_msg_handle` virtual function and handle messages in it;</br>
-Create a `service_pump` object, create a `tcp::client` object, set server address via `connector_base::set_server_addr`, call `service_pump::start_service`;</br>
-Call `connector_base::send_msg` when you have messages need to send.</br>
+Derive your own socket from `client_socket_base`, you must at least re-write the `on_msg` or `on_msg_handle` virtual function and handle messages in it;</br>
+Create a `service_pump` object, create a `tcp::client_base` object, set server address via `client_socket_base::set_server_addr`, call `service_pump::start_service`;</br>
+Call `client_socket_base::send_msg` when you have messages need to send.</br>
 Directory structure:
 -
 All source codes are placed in directory `include/ascs/`, demos are placed in directory `examples`, documents are placed in directory `doc`.</br>
@@ -42,14 +42,7 @@ Demonstrate how to implement UDP communication.</br>
 Demonstrate how to implement TCP communication with ssl.</br>
 Compiler requirement:
 -
-Visual C++ 10.0, GCC 4.6 or Clang 3.1 at least, with c++14 features;</br>
-Debug environment:
--
-win10 vc2015 32/64 bit</br>
-Debian 8 32/64 bit</br>
-Ubuntu 16 64 bit</br>
-Fedora 23 64 bit</br>
-FreeBSD 10 32/64 bit</br>
+Visual C++ 11.0, GCC 4.6 or Clang 3.1 at least, with c++11 features;</br>
 email: mail2tao@163.com
 -
 Community on QQ: 198941541

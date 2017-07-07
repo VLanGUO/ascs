@@ -345,7 +345,7 @@ struct statistic
 	stat_duration send_delay_sum; //from send_(native_)msg (exclude msg packing) to asio::async_write
 	stat_duration send_time_sum; //from asio::async_write to send_handler
 	//above two items indicate your network's speed or load
-	stat_duration pack_time_sum; //udp::socket will not gather this item
+	stat_duration pack_time_sum; //udp::socket_base will not gather this item
 
 	//recv corresponding statistic
 	uint_fast64_t recv_msg_sum; //msgs returned by i_unpacker::parse_msg
@@ -356,7 +356,7 @@ struct statistic
 	stat_duration handle_time_1_sum; //on_msg consumed time, this indicate the efficiency of msg handling
 #endif
 	stat_duration handle_time_2_sum; //on_msg_handle consumed time, this indicate the efficiency of msg handling
-	stat_duration unpack_time_sum; //udp::socket will not gather this item
+	stat_duration unpack_time_sum; //udp::socket_base will not gather this item
 };
 
 class auto_duration
@@ -502,7 +502,7 @@ size_t FUNNAME(const char* const pstr[], const size_t len[], size_t num, bool ca
 } \
 TCP_SEND_MSG_CALL_SWITCH(FUNNAME, size_t)
 
-//guarantee send msg successfully even if can_overflow equal to false, success at here just means putting the msg into tcp::socket's send buffer successfully
+//guarantee send msg successfully even if can_overflow equal to false, success at here just means putting the msg into tcp::socket_base's send buffer successfully
 //if can_overflow equal to false and the buffer is not available, will wait until it becomes available
 #define TCP_SAFE_SEND_MSG(FUNNAME, SEND_FUNNAME) \
 bool FUNNAME(const char* const pstr[], const size_t len[], size_t num, bool can_overflow = false) {while (!SEND_FUNNAME(pstr, len, num, can_overflow)) SAFE_SEND_MSG_CHECK return true;} \
@@ -555,7 +555,7 @@ size_t FUNNAME(const asio::ip::udp::endpoint& peer_addr, const char* const pstr[
 } \
 UDP_SEND_MSG_CALL_SWITCH(FUNNAME, size_t)
 
-//guarantee send msg successfully even if can_overflow equal to false, success at here just means putting the msg into udp::socket's send buffer successfully
+//guarantee send msg successfully even if can_overflow equal to false, success at here just means putting the msg into udp::socket_base's send buffer successfully
 //if can_overflow equal to false and the buffer is not available, will wait until it becomes available
 #define UDP_SAFE_SEND_MSG(FUNNAME, SEND_FUNNAME) \
 bool FUNNAME(const char* const pstr[], const size_t len[], size_t num, bool can_overflow = false)  {return FUNNAME(peer_addr, pstr, len, num, can_overflow);} \
