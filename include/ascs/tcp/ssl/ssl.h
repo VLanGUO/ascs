@@ -169,10 +169,9 @@ public:
 	object_pool(service_pump& service_pump_, const asio::ssl::context::method& m) : super(service_pump_), ctx(m) {}
 	asio::ssl::context& context() {return ctx;}
 
-	using super::create_object;
-	typename object_pool::object_type create_object() {return create_object(this->sp, ctx);}
+	typename object_pool::object_type create_object() {return create_object(this->sp);}
 	template<typename Arg>
-	typename object_pool::object_type create_object(Arg& arg) {return create_object(arg, ctx);}
+	typename object_pool::object_type create_object(Arg& arg) {return super::create_object(arg, ctx);}
 
 protected:
 	asio::ssl::context ctx;

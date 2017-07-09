@@ -147,10 +147,10 @@ protected:
 //protocol: length + body
 //T can be replaceable_buffer (an alias of auto_buffer) or shared_buffer, the latter makes output messages seemingly copyable,
 template<typename T = replaceable_buffer>
-class replaceable_unpacker : public tcp::i_unpacker<T>
+class replaceable_unpacker : public ascs::tcp::i_unpacker<T>
 {
 private:
-	typedef tcp::i_unpacker<T> super;
+	typedef ascs::tcp::i_unpacker<T> super;
 
 public:
 	virtual void reset() {unpacker_.reset();}
@@ -178,10 +178,10 @@ protected:
 //protocol: UDP has message boundary, so we don't need a specific protocol to unpack it.
 //T can be replaceable_buffer (an alias of auto_buffer) or shared_buffer, the latter makes output messages seemingly copyable.
 template<typename T = replaceable_buffer>
-class replaceable_udp_unpacker : public udp::i_unpacker<T>
+class replaceable_udp_unpacker : public ascs::udp::i_unpacker<T>
 {
 private:
-	typedef udp::i_unpacker<T> super;
+	typedef ascs::udp::i_unpacker<T> super;
 
 public:
 	virtual typename super::msg_type parse_msg(size_t bytes_transferred)
