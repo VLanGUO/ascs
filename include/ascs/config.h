@@ -179,6 +179,7 @@
  *  udp::i_unpacker doesn't have this feature, it always and only support unstripped message.
  *
  * FIX:
+ * Fix reconnecting mechanism in demo ssl_test.
  *
  * ENHANCEMENTS:
  * Truly support asio 1.11 (don't use deprecated functions and classes any more), and of course, asio 1.10 will be supported too.
