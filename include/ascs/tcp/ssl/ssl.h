@@ -114,29 +114,20 @@ public:
 	client_socket_base(asio::io_service& io_service_, asio::ssl::context& ctx) : super(io_service_, ctx) {}
 
 	void disconnect(bool reconnect = false) {force_shutdown(reconnect);}
-	void force_shutdown(bool reconnect = false)
-	{
-		if (reconnect)
-		{
-			this->authorized_ = false;
-			super::force_shutdown(true);
-		}
-		else
-			graceful_shutdown();
-	}
+#ifdef ASCS_REUSE_SSL_STREAM
+	void force_shutdown(bool reconnect = false) {this->authorized_ = false; super::force_shutdown(reconnect);}
+	void graceful_shutdown(bool reconnect = false, bool sync = true) {this->authorized_ = false; super::graceful_shutdown(reconnect, sync);}
+#else
+	void force_shutdown(bool reconnect = false) {graceful_shutdown(reconnect);}
 	void graceful_shutdown(bool reconnect = false, bool sync = true)
 	{
 		if (reconnect)
-		{
-			this->authorized_ = false;
-			super::graceful_shutdown(true, sync);
-		}
-		else
-		{
-			this->need_reconnect = false;
-			this->shutdown_ssl(sync);
-		}
+			unified_out::error_out("reconnecting mechanism is not available, please define macro ASCS_REUSE_SSL_STREAM");
+
+		this->need_reconnect = false; //ignore reconnect parameter
+		this->shutdown_ssl(sync);
 	}
+#endif
 
 protected:
 	virtual bool do_start() //add handshake
@@ -188,12 +179,11 @@ private:
 public:
 	server_socket_base(Server& server_, asio::ssl::context& ctx) : super(server_, ctx) {}
 
-#ifdef ASCS_REUSE_SSL_STREAM
 	void disconnect() {force_shutdown();}
+#ifdef ASCS_REUSE_SSL_STREAM
 	void force_shutdown() {this->authorized_ = false; super::force_shutdown();}
 	void graceful_shutdown(bool sync = false) {this->authorized_ = false; super::graceful_shutdown(sync);}
 #else
-	void disconnect() {force_shutdown();}
 	void force_shutdown() {graceful_shutdown();} //must with async mode (the default value), because server_base::uninit will call this function
 	void graceful_shutdown(bool sync = false) {this->shutdown_ssl(sync);}
 #endif
