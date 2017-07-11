@@ -19,6 +19,8 @@
  * 2. since 1.1.5 until 1.2, heartbeat function cannot work properly between windows (at least win-10) and Ubuntu (at least Ubuntu-16.04).
  * 3. since 1.1.5 until 1.2, UDP doesn't support heartbeat because UDP doesn't support OOB data.
  * 4. since 1.1.5 until 1.2, SSL doesn't support heartbeat because SSL doesn't support OOB data.
+ * 5. with old openssl (at least 0.9.7), ssl::client_socket_base and ssl_server_socket_base are not reuable, i'm not sure in which version,
+ *    they became available, seems it's 1.0.0.
  *
  * 2016.9.25	version 1.0.0
  * Based on st_asio_wrapper 1.2.0.
@@ -179,7 +181,7 @@
  *  udp::i_unpacker doesn't have this feature, it always and only support unstripped message.
  *
  * FIX:
- * Fix reconnecting mechanism in demo ssl_test.
+ * Always directly shutdown ssl::client_socket_base if macro ASCS_REUSE_SSL_STREAM been defined.
  *
  * ENHANCEMENTS:
  * Truly support asio 1.11 (don't use deprecated functions and classes any more), and of course, asio 1.10 will be supported too.
