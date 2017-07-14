@@ -88,16 +88,6 @@ protected:
 	virtual void uninit() {this->stop(); force_shutdown();} //if you wanna graceful shutdown, call graceful_shutdown before service_pump::stop_service invocation.
 };
 
-#ifdef ASCS_HAS_TEMPLATE_USING
-template<typename Socket, typename Pool = object_pool<Socket>> using client_base = multi_client_base<Socket, Pool>;
-#else
-template<typename Socket, typename Pool = object_pool<Socket>> class client_base : public multi_client_base<Socket, Pool>
-{
-public:
-	client_base(service_pump& service_pump_) : multi_client_base<Socket, Pool>(service_pump_) {}
-};
-#endif
-
 }} //namespace
 
 #endif /* _ASCS_CLIENT_H_ */

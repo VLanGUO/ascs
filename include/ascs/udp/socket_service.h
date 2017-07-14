@@ -56,16 +56,6 @@ protected:
 	virtual void uninit() {this->stop(); graceful_shutdown();}
 };
 
-#ifdef ASCS_HAS_TEMPLATE_USING
-template<typename Socket, typename Pool = object_pool<Socket>> using service_base = multi_service_base<Socket, Pool>;
-#else
-template<typename Socket, typename Pool = object_pool<Socket>> class service_base : public multi_service_base<Socket, Pool>
-{
-public:
-	service_base(service_pump& service_pump_) : multi_service_base<Socket, Pool>(service_pump_) {}
-};
-#endif
-
 }} //namespace
 
 #endif /* _ASCS_UDP_SOCKET_SERVICE_H_ */
