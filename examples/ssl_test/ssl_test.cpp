@@ -43,7 +43,7 @@ int main(int argc, const char* argv[])
 
 ///*
 	//method #1
-	client client_(sp, asio::ssl::context::sslv23_client);
+	multi_client client_(sp, asio::ssl::context::sslv23_client);
 	client_.context().set_options(asio::ssl::context::default_workarounds | asio::ssl::context::no_sslv2 | asio::ssl::context::single_dh_use);
 	client_.context().set_verify_mode(asio::ssl::context::verify_peer | asio::ssl::context::verify_fail_if_no_peer_cert);
 	client_.context().load_verify_file("certs/server.crt");

@@ -162,10 +162,10 @@ private:
 	size_t recv_index, msg_num;
 };
 
-class echo_client : public client_base<echo_socket>
+class echo_client : public multi_client_base<echo_socket>
 {
 public:
-	echo_client(service_pump& service_pump_) : client_base<echo_socket>(service_pump_) {}
+	echo_client(service_pump& service_pump_) : multi_client_base<echo_socket>(service_pump_) {}
 
 	uint64_t get_recv_bytes()
 	{

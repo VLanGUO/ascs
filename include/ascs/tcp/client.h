@@ -30,15 +30,15 @@ public:
 #endif
 
 template<typename Socket, typename Pool = object_pool<Socket>>
-class client_base : public multi_socket_service<Socket, Pool>
+class multi_client_base : public multi_socket_service<Socket, Pool>
 {
 private:
 	typedef multi_socket_service<Socket, Pool> super;
 
 public:
-	client_base(service_pump& service_pump_) : super(service_pump_) {}
+	multi_client_base(service_pump& service_pump_) : super(service_pump_) {}
 	template<typename Arg>
-	client_base(service_pump& service_pump_, const Arg& arg) : super(service_pump_, arg) {}
+	multi_client_base(service_pump& service_pump_, const Arg& arg) : super(service_pump_, arg) {}
 
 	//connected link size, may smaller than total object size (object_pool::size)
 	size_t valid_size()
@@ -87,6 +87,16 @@ public:
 protected:
 	virtual void uninit() {this->stop(); force_shutdown();} //if you wanna graceful shutdown, call graceful_shutdown before service_pump::stop_service invocation.
 };
+
+#ifdef ASCS_HAS_TEMPLATE_USING
+template<typename Socket, typename Pool = object_pool<Socket>> using client_base = multi_client_base<Socket, Pool>;
+#else
+template<typename Socket, typename Pool = object_pool<Socket>> class client_base : public multi_client_base<Socket, Pool>
+{
+public:
+	client_base(service_pump& service_pump_) : multi_client_base<Socket, Pool>(service_pump_) {}
+};
+#endif
 
 }} //namespace
 
