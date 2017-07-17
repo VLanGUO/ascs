@@ -202,7 +202,8 @@ public:
 	queue() {}
 	queue(size_t capacity) : Container(capacity) {}
 
-	size_t size() {typename Lockable::lock_guard lock(*this); return Container::size();}
+	using Container::size;
+	using Container::empty;
 	void clear() {typename Lockable::lock_guard lock(*this); Container::clear();}
 	void swap(Container& other) {typename Lockable::lock_guard lock(*this); Container::swap(other);}
 
