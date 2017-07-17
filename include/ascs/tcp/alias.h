@@ -23,7 +23,6 @@ template <typename Packer, typename Unpacker, typename Socket = asio::ip::tcp::s
 	template<typename, typename> class InQueue = ASCS_INPUT_QUEUE, template<typename> class InContainer = ASCS_INPUT_CONTAINER,
 	template<typename, typename> class OutQueue = ASCS_OUTPUT_QUEUE, template<typename> class OutContainer = ASCS_OUTPUT_CONTAINER>
 using connector_base = client_socket_base<Packer, Unpacker, Socket, InQueue, InContainer, OutQueue, OutContainer>;
-
 template<typename Socket, typename Pool = object_pool<Socket>> using client_base = multi_client_base<Socket, Pool>;
 #else
 template <typename Packer, typename Unpacker, typename Socket = asio::ip::tcp::socket,
@@ -38,7 +37,6 @@ public:
 	connector_base(asio::io_service& io_service_) : super(io_service_) {}
 	template<typename Arg> connector_base(asio::io_service& io_service_, Arg& arg) : super(io_service_, arg) {}
 };
-
 template<typename Socket, typename Pool = object_pool<Socket>> class client_base : public multi_client_base<Socket, Pool>
 {
 public:
