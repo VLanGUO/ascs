@@ -42,7 +42,7 @@ inline bool operator==(asio::error::misc_errors _Left, const asio::error_code& _
 inline bool operator!=(asio::error::misc_errors _Left, const asio::error_code& _Right) {return !(_Left == _Right);}
 #endif
 
-class scope_atomic_lock : public asio::detail::noncopyable
+class scope_atomic_lock : public asio::noncopyable
 {
 public:
 	scope_atomic_lock(std::atomic_flag& atomic_) : _locked(false), atomic(atomic_) {lock();} //atomic_ must has been initialized with false
@@ -84,7 +84,7 @@ public:
 //convert '->' operation to '.' operation
 //user need to allocate object, and auto_buffer will free it
 template<typename T>
-class auto_buffer : public asio::detail::noncopyable
+class auto_buffer : public asio::noncopyable
 {
 public:
 	typedef T* buffer_type;
