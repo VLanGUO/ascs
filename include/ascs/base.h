@@ -83,8 +83,10 @@ public:
 
 //convert '->' operation to '.' operation
 //user need to allocate object, and auto_buffer will free it
-template<typename T>
-class auto_buffer : public asio::noncopyable
+template<typename T> class auto_buffer
+#if defined(_MSC_VER) && _MSC_VER <= 1800
+	: public asio::noncopyable
+#endif
 {
 public:
 	typedef T* buffer_type;
@@ -110,6 +112,7 @@ public:
 protected:
 	buffer_type buffer;
 };
+typedef auto_buffer<i_buffer> replaceable_buffer;
 
 //convert '->' operation to '.' operation
 //user need to allocate object, and shared_buffer will free it
@@ -123,12 +126,11 @@ public:
 	shared_buffer() {}
 	shared_buffer(T* _buffer) {buffer.reset(_buffer);}
 	shared_buffer(buffer_type _buffer) : buffer(_buffer) {}
-	shared_buffer(const shared_buffer& other) : buffer(other.buffer) {}
-	shared_buffer(shared_buffer&& other) : buffer(std::move(other.buffer)) {}
-	shared_buffer& operator=(const shared_buffer& other) {buffer = other.buffer; return *this;}
-	~shared_buffer() {clear();}
 
+#if defined(_MSC_VER) && _MSC_VER <= 1800
+	shared_buffer(shared_buffer&& other) : buffer(std::move(other.buffer)) {}
 	shared_buffer& operator=(shared_buffer&& other) {clear(); swap(other); return *this;}
+#endif
 
 	buffer_type raw_buffer() const {return buffer;}
 	void raw_buffer(T* _buffer) {buffer.reset(_buffer);}
@@ -145,13 +147,6 @@ protected:
 	buffer_type buffer;
 };
 //not like auto_buffer, shared_buffer is copyable, but auto_buffer is a bit more efficient.
-
-#if !defined(_MSC_VER) || _MSC_VER > 1800 //for naughty VC++, it violate the standard and even itself usually.
-typedef auto_buffer<i_buffer> replaceable_buffer;
-#else
-typedef shared_buffer<i_buffer> replaceable_buffer; //before VC++ 14.0 (2015), auto_buffer will lead compilation error
-#endif
-//packer or/and unpacker used replaceable_buffer as their msg type will be replaceable.
 
 //packer concept
 template<typename MsgType>
@@ -386,7 +381,6 @@ struct obj_with_begin_time : public T
 	obj_with_begin_time(T&& msg) : T(std::move(msg)) {restart();}
 	void restart() {restart(statistic::now());}
 	void restart(const typename statistic::stat_time& begin_time_) {begin_time = begin_time_;}
-	using T::operator=;
 	using T::swap;
 	void swap(obj_with_begin_time& other) {T::swap(other); std::swap(begin_time, other.begin_time);}
 

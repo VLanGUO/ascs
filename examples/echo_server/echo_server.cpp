@@ -22,7 +22,11 @@
 //3-prefix and/or suffix packer and unpacker
 
 #if 1 == PACKER_UNPACKER_TYPE
+#if defined(_MSC_VER) && _MSC_VER <= 1800
+#define ASCS_DEFAULT_PACKER replaceable_packer<shared_buffer<i_buffer>>
+#else
 #define ASCS_DEFAULT_PACKER replaceable_packer<>
+#endif
 #define ASCS_DEFAULT_UNPACKER replaceable_unpacker<>
 #elif 2 == PACKER_UNPACKER_TYPE
 #undef ASCS_HEARTBEAT_INTERVAL
