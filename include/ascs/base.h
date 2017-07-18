@@ -34,7 +34,7 @@
 namespace ascs
 {
 
-#if defined(_MSC_VER) && _MSC_VER < 1900 //terrible VC++
+#if defined(_MSC_VER) && _MSC_VER <= 1800 //terrible VC++
 inline bool operator==(asio::error::basic_errors _Left, const asio::error_code& _Right) {return _Left == _Right.value();}
 inline bool operator!=(asio::error::basic_errors _Left, const asio::error_code& _Right) {return !(_Left == _Right);}
 
@@ -146,10 +146,10 @@ protected:
 };
 //not like auto_buffer, shared_buffer is copyable, but auto_buffer is a bit more efficient.
 
-#if !defined(_MSC_VER) || _MSC_VER >= 1900 //for naughty VC++, it violate the standard and even itself usually.
+#if !defined(_MSC_VER) || _MSC_VER > 1800 //for naughty VC++, it violate the standard and even itself usually.
 typedef auto_buffer<i_buffer> replaceable_buffer;
 #else
-typedef shared_buffer<i_buffer> replaceable_buffer; //before VC++ 14.0, auto_buffer will lead compilation error
+typedef shared_buffer<i_buffer> replaceable_buffer; //before VC++ 14.0 (2015), auto_buffer will lead compilation error
 #endif
 //packer or/and unpacker used replaceable_buffer as their msg type will be replaceable.
 

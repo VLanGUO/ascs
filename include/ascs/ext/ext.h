@@ -54,7 +54,7 @@ public:
 };
 
 class basic_buffer
-#if !defined(_MSC_VER) || _MSC_VER >= 1900 //for naughty VC++, it violate the standard and even itself usually.
+#if !defined(_MSC_VER) || _MSC_VER > 1800 //for naughty VC++, it violate the standard and even itself usually.
 	: public asio::detail::noncopyable //seems asio's noncopyable is not as good as boost's.
 #endif
 {

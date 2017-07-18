@@ -181,7 +181,7 @@
  *  udp::i_unpacker doesn't have this feature, it always and only support unstripped message.
  *
  * FIX:
- * Always directly shutdown ssl::client_socket_base if macro ASCS_REUSE_SSL_STREAM been defined.
+ * Fix reconnecting mechanism in demo ssl_test.
  *
  * ENHANCEMENTS:
  * Truly support asio 1.11 (don't use deprecated functions and classes any more), and of course, asio 1.10 will be supported too.
@@ -194,6 +194,30 @@
  * Use mutable_buffer and const_buffer instead of mutable_buffers_1 and const_buffers_1 if possible, this can gain some performance improvement.
  * Call force_shutdown instead of graceful_shutdown in tcp::client_base::uninit().
  *
+ * ===============================================================
+ * 2017.x.x		version 1.2.3
+ *
+ * SPECIAL ATTENTION (incompatible with old editions):
+ * i_server has been moved from ascs to ascs::tcp.
+ *
+ * HIGHLIGHT:
+ *
+ * FIX:
+ * Always directly shutdown ssl::client_socket_base if macro ASCS_REUSE_SSL_STREAM been defined.
+ * Make queue::clear and swap thread-safe if possible.
+ *
+ * ENHANCEMENTS:
+ *
+ * DELETION:
+ * Not support Visual C++ 11.0 (2012) any more, use st_asio_wrapper instead.
+ *
+ * REFACTORING:
+ * Move all deprecated classes (connector_base, client_base, service_base) to alias.h
+ *
+ * REPLACEMENTS:
+ * Rename tcp::client_base to tcp::multi_client_base, ext::tcp::client to ext::tcp::multi_client, udp::service_base to udp::multi_service_base,
+ *  ext::udp::service to ext::udp::multi_service. Old ones are still available, but have became alias.
+ *
  */
 
 #ifndef _ASCS_CONFIG_H_
@@ -203,17 +227,13 @@
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#define ASCS_VER		10202	//[x]xyyzz -> [x]x.[y]y.[z]z
-#define ASCS_VERSION	"1.2.2"
+#define ASCS_VER		10203	//[x]xyyzz -> [x]x.[y]y.[z]z
+#define ASCS_VERSION	"1.2.3"
 
 //asio and compiler check
 #ifdef _MSC_VER
 	#define ASCS_SF "%Iu" //format used to print 'size_t'
-	static_assert(_MSC_VER >= 1700, "ascs needs Visual C++ 11.0 or higher.");
-
-	#if _MSC_VER >= 1800
-		#define ASCS_HAS_TEMPLATE_USING
-	#endif
+	static_assert(_MSC_VER >= 1800, "ascs needs Visual C++ 12.0 (2013) or higher.");
 #elif defined(__GNUC__)
 	#define ASCS_SF "%zu" //format used to print 'size_t'
 	#ifdef __x86_64__
@@ -228,8 +248,6 @@
 	#if !defined(__GXX_EXPERIMENTAL_CXX0X__) && (!defined(__cplusplus) || __cplusplus < 201103L)
 		#error ascs needs c++11 or higher.
 	#endif
-
-	#define ASCS_HAS_TEMPLATE_USING
 #else
 	#error ascs only support Visual C++, GCC and Clang.
 #endif
@@ -384,17 +402,7 @@ static_assert(ASCS_ASYNC_ACCEPT_NUM > 0, "async accept number must be bigger tha
 //ConcurrentQueue is lock-free, please refer to https://github.com/cameron314/concurrentqueue
 #ifdef ASCS_HAS_CONCURRENT_QUEUE
 	#include <concurrentqueue.h>
-
-	#ifdef ASCS_HAS_TEMPLATE_USING
 	template<typename T> using concurrent_queue = moodycamel::ConcurrentQueue<T>;
-	#else
-	template<typename T> class concurrent_queue : public moodycamel::ConcurrentQueue<T>
-	{
-	public:
-		concurrent_queue() {}
-		explicit concurrent_queue(size_t capacity) : moodycamel::ConcurrentQueue<T>(capacity) {}
-	};
-	#endif
 
 	#ifndef ASCS_INPUT_QUEUE
 	#define ASCS_INPUT_QUEUE lock_free_queue

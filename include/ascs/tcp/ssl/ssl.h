@@ -203,27 +203,9 @@ private:
 	void handle_handshake(const asio::error_code& ec) {super::handle_handshake(ec); if (ec) this->server.del_socket(this->shared_from_this());}
 };
 
-#ifdef ASCS_HAS_TEMPLATE_USING
 template<typename Socket, typename Pool = object_pool<Socket>, typename Server = tcp::i_server> using server_base = tcp::server_base<Socket, Pool, Server>;
 template<typename Socket> using single_client_base = tcp::single_client_base<Socket>;
 template<typename Socket, typename Pool = object_pool<Socket>> using multi_client_base = tcp::multi_client_base<Socket, Pool>;
-#else
-template<typename Socket, typename Pool = object_pool<Socket>, typename Server = tcp::i_server> class server_base : public tcp::server_base<Socket, Pool, Server>
-{
-public:
-	server_base(service_pump& service_pump_, asio::ssl::context::method m) : tcp::server_base<Socket, Pool, Server>(service_pump_, m) {}
-};
-template<typename Socket> class single_client_base : public tcp::single_client_base<Socket>
-{
-public:
-	single_client_base(service_pump& service_pump_, asio::ssl::context& ctx) : tcp::single_client_base<Socket>(service_pump_, ctx) {}
-};
-template<typename Socket, typename Pool = object_pool<Socket>> class multi_client_base : public tcp::multi_client_base<Socket, Pool>
-{
-public:
-	multi_client_base(service_pump& service_pump_, asio::ssl::context::method m) : tcp::multi_client_base<Socket, Pool>(service_pump_, m) {}
-};
-#endif
 
 }} //namespace
 

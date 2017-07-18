@@ -20,11 +20,7 @@ namespace ascs
 
 //ascs requires that container must take one and only one template argument.
 #if defined(_MSC_VER) || defined(__clang__) || __GNUC__ >= 5
-	#ifdef ASCS_HAS_TEMPLATE_USING
-	template<typename T> using list = std::list<T>;
-	#else
-	template<typename T> class list : public std::list<T> {};
-	#endif
+template<typename T> using list = std::list<T>;
 #else
 //a substitute of std::list (before gcc 5), it's size() function has O(1) complexity
 //BTW, the naming rule is not mine, I copied them from std::list in Visual C++ 14.0
@@ -220,23 +216,8 @@ public:
 	bool try_dequeue_(T& item) {if (this->empty()) return false; item.swap(this->front()); this->pop_front(); return true;}
 };
 
-#ifdef ASCS_HAS_TEMPLATE_USING
 template<typename T, typename Container> using non_lock_queue = queue<T, Container, dummy_lockable>; //thread safety depends on Container
 template<typename T, typename Container> using lock_queue = queue<T, Container, lockable>;
-#else
-template<typename T, typename Container> class non_lock_queue : public queue<T, Container, dummy_lockable> //thread safety depends on Container
-{
-public:
-	non_lock_queue() {}
-	non_lock_queue(size_t capacity) : queue<T, Container, dummy_lockable>(capacity) {}
-};
-template<typename T, typename Container> class lock_queue : public queue<T, Container, lockable>
-{
-public:
-	lock_queue() {}
-	lock_queue(size_t capacity) : queue<T, Container, lockable>(capacity) {}
-};
-#endif
 
 } //namespace
 
