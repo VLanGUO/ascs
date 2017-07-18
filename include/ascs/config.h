@@ -185,7 +185,6 @@
  *
  * ENHANCEMENTS:
  * Truly support asio 1.11 (don't use deprecated functions and classes any more), and of course, asio 1.10 will be supported too.
- * Optimized and simplified auto_buffer, shared_buffer and ext::basic_buffer.
  *
  * DELETION:
  *
@@ -208,6 +207,7 @@
  * Make queue::clear and swap thread-safe if possible.
  *
  * ENHANCEMENTS:
+ * Optimized and simplified auto_buffer, shared_buffer and ext::basic_buffer.
  *
  * DELETION:
  * Not support Visual C++ 11.0 (2012) any more, use st_asio_wrapper instead.
