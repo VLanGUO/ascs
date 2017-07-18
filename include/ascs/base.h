@@ -125,7 +125,7 @@ public:
 	shared_buffer(buffer_type _buffer) : buffer(_buffer) {}
 	shared_buffer(const shared_buffer& other) : buffer(other.buffer) {}
 	shared_buffer(shared_buffer&& other) : buffer(std::move(other.buffer)) {}
-	const shared_buffer& operator=(const shared_buffer& other) {buffer = other.buffer; return *this;}
+	shared_buffer& operator=(const shared_buffer& other) {buffer = other.buffer; return *this;}
 	~shared_buffer() {clear();}
 
 	shared_buffer& operator=(shared_buffer&& other) {clear(); swap(other); return *this;}
@@ -232,7 +232,7 @@ namespace udp
 		udp_msg(const asio::ip::udp::endpoint& _peer_addr, const MsgType& msg) : MsgType(msg), peer_addr(_peer_addr) {}
 		udp_msg(const asio::ip::udp::endpoint& _peer_addr, MsgType&& msg) : MsgType(std::move(msg)), peer_addr(_peer_addr) {}
 
-		using MsgType::operator =;
+		using MsgType::operator=;
 		using MsgType::swap;
 		void swap(udp_msg& other) {std::swap(peer_addr, other.peer_addr); MsgType::swap(other);}
 		void swap(asio::ip::udp::endpoint& addr, MsgType&& tmp_msg) {std::swap(peer_addr, addr); MsgType::swap(tmp_msg);}
@@ -266,8 +266,8 @@ struct statistic
 	static stat_time now() {return std::chrono::system_clock::now();}
 	typedef std::chrono::system_clock::duration stat_duration;
 #else
-	struct dummy_duration {const dummy_duration& operator +=(const dummy_duration& other) {return *this;}}; //not a real duration, just satisfy compiler(d1 += d2)
-	struct dummy_time {dummy_duration operator -(const dummy_time& other) {return dummy_duration();}}; //not a real time, just satisfy compiler(t1 - t2)
+	struct dummy_duration {dummy_duration& operator+=(const dummy_duration& other) {return *this;}}; //not a real duration, just satisfy compiler(d1 += d2)
+	struct dummy_time {dummy_duration operator-(const dummy_time& other) {return dummy_duration();}}; //not a real time, just satisfy compiler(t1 - t2)
 
 	typedef dummy_time stat_time;
 	static stat_time now() {return stat_time();}
@@ -293,7 +293,7 @@ struct statistic
 	void reset() {reset_number();}
 #endif
 
-	statistic& operator +=(const struct statistic& other)
+	statistic& operator+=(const struct statistic& other)
 	{
 		send_msg_sum += other.send_msg_sum;
 		send_byte_sum += other.send_byte_sum;
@@ -386,7 +386,7 @@ struct obj_with_begin_time : public T
 	obj_with_begin_time(T&& msg) : T(std::move(msg)) {restart();}
 	void restart() {restart(statistic::now());}
 	void restart(const typename statistic::stat_time& begin_time_) {begin_time = begin_time_;}
-	using T::operator =;
+	using T::operator=;
 	using T::swap;
 	void swap(obj_with_begin_time& other) {T::swap(other); std::swap(begin_time, other.begin_time);}
 

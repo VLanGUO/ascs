@@ -44,6 +44,8 @@ public:
 
 	list() : s(0) {}
 	list(list&& other) : s(0) {swap(other);}
+
+	list& operator=(list&& other) {clear(); swap(other); return *this;}
 	void swap(list& other) {impl.swap(other.impl); std::swap(s, other.s);}
 
 	bool empty() const {return 0 == s;}
