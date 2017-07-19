@@ -116,8 +116,7 @@ typedef auto_buffer<i_buffer> replaceable_buffer;
 
 //convert '->' operation to '.' operation
 //user need to allocate object, and shared_buffer will free it
-template<typename T>
-class shared_buffer
+template<typename T> class shared_buffer
 {
 public:
 	typedef std::shared_ptr<T> buffer_type;
@@ -147,6 +146,7 @@ protected:
 	buffer_type buffer;
 };
 //not like auto_buffer, shared_buffer is copyable, but auto_buffer is a bit more efficient.
+//packer or/and unpacker who used auto_buffer or shared_buffer as its msg type will be replaceable.
 
 //packer concept
 template<typename MsgType>
