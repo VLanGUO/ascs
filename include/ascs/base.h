@@ -229,8 +229,12 @@ namespace udp
 
 		using MsgType::operator=;
 		using MsgType::swap;
-		void swap(udp_msg& other) {std::swap(peer_addr, other.peer_addr); MsgType::swap(other);}
-		void swap(asio::ip::udp::endpoint& addr, MsgType&& tmp_msg) {std::swap(peer_addr, addr); MsgType::swap(tmp_msg);}
+		void swap(udp_msg& other) {MsgType::swap(other); std::swap(peer_addr, other.peer_addr);}
+
+#if defined(_MSC_VER) && _MSC_VER <= 1800
+		udp_msg(udp_msg&& other) : MsgType(std::move(other)), peer_addr(std::move(other.peer_addr)) {}
+		udp_msg& operator=(udp_msg&& other) {MsgType::clear(); swap(other); return *this;}
+#endif
 	};
 
 	template<typename MsgType>
@@ -377,11 +381,13 @@ private:
 template<typename T>
 struct obj_with_begin_time : public T
 {
-	obj_with_begin_time() {restart();}
-	obj_with_begin_time(T&& msg) : T(std::move(msg)) {restart();}
+	obj_with_begin_time() {}
+	obj_with_begin_time(T&& obj) : T(std::move(obj)) {restart();}
+	obj_with_begin_time& operator=(T&& obj) {T::operator=(std::move(obj)); restart(); return *this;}
+
 	void restart() {restart(statistic::now());}
 	void restart(const typename statistic::stat_time& begin_time_) {begin_time = begin_time_;}
-	using T::swap;
+	void swap(T& obj) {T::swap(obj); restart();}
 	void swap(obj_with_begin_time& other) {T::swap(other); std::swap(begin_time, other.begin_time);}
 
 	typename statistic::stat_time begin_time;
@@ -454,7 +460,7 @@ template<typename _Predicate> void NAME(const _Predicate& __pred) const {for (au
 //used by both TCP and UDP
 #define SAFE_SEND_MSG_CHECK \
 { \
-	if (this->stopped() || !this->is_ready()) return false; \
+	if (!this->is_ready()) return false; \
 	std::this_thread::sleep_for(std::chrono::milliseconds(50)); \
 }
 
@@ -483,20 +489,14 @@ TCP_SEND_MSG_CALL_SWITCH(FUNNAME, bool)
 #define TCP_SYNC_SEND_MSG(FUNNAME, NATIVE) \
 size_t FUNNAME(const char* const pstr[], const size_t len[], size_t num, bool can_overflow = false) \
 { \
-	if (!this->sending && !this->stopped() && this->is_ready()) \
+	if (this->lock_sending_flag()) \
 	{ \
-		scope_atomic_lock lock(this->send_atomic); \
-		if (!this->sending && lock.locked()) \
-		{ \
-			this->sending = true; \
-			lock.unlock(); \
-			auto_duration dur(this->stat.pack_time_sum); \
-			auto msg = this->packer_->pack_msg(pstr, len, num, NATIVE); \
-			dur.end(); \
-			if (msg.empty()) \
-				unified_out::error_out("found an empty message, please check your packer."); \
-			return do_sync_send_msg(msg); /*always send message even it's empty, this is very important*/ \
-		} \
+		auto_duration dur(this->stat.pack_time_sum); \
+		auto msg = this->packer_->pack_msg(pstr, len, num, NATIVE); \
+		dur.end(); \
+		if (msg.empty()) \
+			unified_out::error_out("found an empty message, please check your packer."); \
+		return do_sync_send_msg(msg); /*always send message even it's empty, this is very important*/ \
 	} \
 	return 0; \
 } \
@@ -538,18 +538,12 @@ UDP_SEND_MSG_CALL_SWITCH(FUNNAME, bool)
 size_t FUNNAME(const char* const pstr[], const size_t len[], size_t num, bool can_overflow = false) {return FUNNAME(peer_addr, pstr, len, num, can_overflow);} \
 size_t FUNNAME(const asio::ip::udp::endpoint& peer_addr, const char* const pstr[], const size_t len[], size_t num, bool can_overflow = false) \
 { \
-	if (!this->sending && !this->stopped() && this->is_ready()) \
+	if (this->lock_sending_flag()) \
 	{ \
-		scope_atomic_lock lock(this->send_atomic); \
-		if (!this->sending && lock.locked()) \
-		{ \
-			this->sending = true; \
-			lock.unlock(); \
-			auto msg = this->packer_->pack_msg(pstr, len, num, NATIVE); \
-			if (msg.empty()) \
-				unified_out::error_out("found an empty message, please check your packer."); \
-			return do_sync_send_msg(peer_addr, msg); /*always send message even it's empty, this is very important*/ \
-		} \
+		auto msg = this->packer_->pack_msg(pstr, len, num, NATIVE); \
+		if (msg.empty()) \
+			unified_out::error_out("found an empty message, please check your packer."); \
+		return do_sync_send_msg(peer_addr, msg); /*always send message even it's empty, this is very important*/ \
 	} \
 	return 0; \
 } \

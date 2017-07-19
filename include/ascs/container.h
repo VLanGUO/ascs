@@ -133,6 +133,7 @@ public:
 	typedef std::lock_guard<dummy_lockable> lock_guard;
 
 	//lockable, dummy
+	bool is_lockable() const {return false;}
 	void lock() const {}
 	void unlock() const {}
 };
@@ -143,6 +144,7 @@ public:
 	typedef std::lock_guard<lockable> lock_guard;
 
 	//lockable
+	bool is_lockable() const {return true;}
 	void lock() {mutex.lock();}
 	void unlock() {mutex.unlock();}
 
@@ -167,6 +169,7 @@ public:
 	lock_free_queue() {}
 	lock_free_queue(size_t capacity) : Container(capacity) {}
 
+	bool is_thread_safe() const {return true;}
 	size_t size() const {return this->size_approx();}
 	bool empty() const {return 0 == size();}
 	void clear() {Container(std::move(*this));}
@@ -200,6 +203,7 @@ public:
 	queue() {}
 	queue(size_t capacity) : Container(capacity) {}
 
+	bool is_thread_safe() const {return Lockable::is_lockable();}
 	using Container::size;
 	using Container::empty;
 	void clear() {typename Lockable::lock_guard lock(*this); Container::clear();}

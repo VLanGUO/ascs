@@ -208,12 +208,16 @@
  *
  * ENHANCEMENTS:
  * Optimized and simplified auto_buffer, shared_buffer and ext::basic_buffer.
+ * Optimized class obj_with_begin_time.
+ * Not use sending buffer (send_msg_buffer) if possible.
+ * Reduced stopped() invocation (because it needs locks).
  *
  * DELETION:
  * Not support Visual C++ 11.0 (2012) any more, use st_asio_wrapper instead.
  *
  * REFACTORING:
  * Move all deprecated classes (connector_base, client_base, service_base) to alias.h
+ * Refactor the mechanism of message sending.
  *
  * REPLACEMENTS:
  * Rename tcp::client_base to tcp::multi_client_base, ext::tcp::client to ext::tcp::multi_client, udp::service_base to udp::multi_service_base,
