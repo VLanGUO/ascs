@@ -60,7 +60,7 @@ public:
 	typedef const object_type object_ctype;
 	typedef std::list<object_type> container_type;
 
-	service_pump() : started(false), real_thread_num(0), del_thread_num(0), del_thread_req(false) {}
+	service_pump() : started(false), del_thread_req(false) {real_thread_num.store(0, std::memory_order_relaxed); del_thread_num.store(0, std::memory_order_relaxed);}
 	virtual ~service_pump() {stop_service();}
 
 	object_type find(int id)
