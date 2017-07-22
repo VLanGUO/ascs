@@ -201,6 +201,8 @@
  * i_server has been moved from ascs to ascs::tcp.
  *
  * HIGHLIGHT:
+ * Support decreasing (increasing already supported) the number of service thread at runtime by defining ASCS_DECREASE_THREAD_AT_RUNTIME macro,
+ *  suggest to define ASCS_AVOID_AUTO_STOP_SERVICE macro too.
  *
  * FIX:
  * Always directly shutdown ssl::client_socket_base if macro ASCS_REUSE_SSL_STREAM been defined.
@@ -211,6 +213,8 @@
  * Optimized class obj_with_begin_time.
  * Not use sending buffer (send_msg_buffer) if possible.
  * Reduced stopped() invocation (because it needs locks).
+ * Introduced asio::io_service::work (asio::executor_work_guard) by defining ASCS_AVOID_AUTO_STOP_SERVICE macro.
+ * Add function service_pump::service_thread_num to fetch the real number of service thread (must define ASCS_DECREASE_THREAD_AT_RUNTIME macro).
  *
  * DELETION:
  * Not support Visual C++ 11.0 (2012) any more, use st_asio_wrapper instead.
@@ -477,6 +481,12 @@ static_assert(ASCS_HEARTBEAT_MAX_ABSENCE > 0, "heartbeat absence must be bigger 
 //I tried many ways, onle one way can make asio::ssl::stream reusable, which is:
 // don't call any shutdown functions of asio::ssl::stream, just call asio::ip::tcp::socket's shutdown function,
 // this seems not a normal procedure, but it works, I believe that asio's defect caused this problem.
+
+//#define ASCS_AVOID_AUTO_STOP_SERVICE
+//wrap service_pump with asio::io_service::work (asio::executor_work_guard), then it will never run out
+
+//#define ASCS_DECREASE_THREAD_AT_RUNTIME
+//enable decreasing service thread at runtime.
 //configurations
 
 #endif /* _ASCS_CONFIG_H_ */
