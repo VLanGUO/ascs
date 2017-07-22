@@ -60,7 +60,7 @@ public:
 	typedef const object_type object_ctype;
 	typedef std::list<object_type> container_type;
 
-	service_pump() : started(false), del_thread_req(false) {real_thread_num.store(0, std::memory_order_relaxed); del_thread_num.store(0, std::memory_order_relaxed);}
+	service_pump() : started(false), real_thread_num(0), del_thread_num(0), del_thread_req(false) {}
 	virtual ~service_pump() {stop_service();}
 
 	object_type find(int id)
@@ -217,7 +217,10 @@ protected:
 	size_t run()
 	{
 		size_t n = 0;
+		std::stringstream os;
 
+		os << "service thread[" << std::this_thread::get_id() << "] begin.";
+		unified_out::info_out(os.str().data());
 		++real_thread_num;
 		while (true)
 		{
@@ -245,6 +248,8 @@ protected:
 				break;
 		}
 		--real_thread_num;
+		os.str(""); os << "service thread[" << std::this_thread::get_id() << "] end.";
+		unified_out::info_out(os.str().data());
 
 		return n;
 	}
@@ -273,8 +278,8 @@ protected:
 	std::mutex service_can_mutex;
 
 	std::list<std::thread> service_threads;
-	std::atomic_int real_thread_num;
-	std::atomic_int del_thread_num;
+	std::atomic_int_fast32_t real_thread_num;
+	std::atomic_int_fast32_t del_thread_num;
 	bool del_thread_req;
 
 #ifdef ASCS_AVOID_AUTO_STOP_SERVICE
