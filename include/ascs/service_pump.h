@@ -18,7 +18,7 @@
 namespace ascs
 {
 
-class service_pump : public asio::io_service
+class service_pump : public asio::io_context
 {
 public:
 	class i_service
@@ -238,9 +238,9 @@ protected:
 			//we cannot always decrease service thread timely (because run_one can block).
 			size_t this_n = 0;
 #ifdef ASCS_ENHANCED_STABILITY
-			try {this_n = asio::io_service::run_one();} catch (const asio::system_error& e) {if (!on_exception(e)) break;}
+			try {this_n = asio::io_context::run_one();} catch (const asio::system_error& e) {if (!on_exception(e)) break;}
 #else
-			this_n = asio::io_service::run_one();
+			this_n = asio::io_context::run_one();
 #endif
 			if (this_n > 0)
 				n += this_n; //n can overflow, please note.
@@ -255,7 +255,7 @@ protected:
 	}
 #else
 #ifdef ASCS_ENHANCED_STABILITY
-	size_t run() {while (true) {try {return asio::io_service::run();} catch (const asio::system_error& e) {if (!on_exception(e)) return 0;}}}
+	size_t run() {while (true) {try {return asio::io_context::run();} catch (const asio::system_error& e) {if (!on_exception(e)) return 0;}}}
 #endif
 #endif
 

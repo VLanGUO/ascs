@@ -30,9 +30,9 @@ public:
 	static const timer::tid TIMER_CONNECT = TIMER_BEGIN;
 	static const timer::tid TIMER_END = TIMER_BEGIN + 10;
 
-	client_socket_base(asio::io_service& io_service_) : super(io_service_), need_reconnect(true) {set_server_addr(ASCS_SERVER_PORT, ASCS_SERVER_IP);}
+	client_socket_base(asio::io_context& io_context_) : super(io_context_), need_reconnect(true) {set_server_addr(ASCS_SERVER_PORT, ASCS_SERVER_IP);}
 	template<typename Arg>
-	client_socket_base(asio::io_service& io_service_, Arg& arg) : super(io_service_, arg), need_reconnect(true) {set_server_addr(ASCS_SERVER_PORT, ASCS_SERVER_IP);}
+	client_socket_base(asio::io_context& io_context_, Arg& arg) : super(io_context_, arg), need_reconnect(true) {set_server_addr(ASCS_SERVER_PORT, ASCS_SERVER_IP);}
 
 	//reset all, be ensure that there's no any operations performed on this socket when invoke it
 	//subclass must re-write this function to initialize itself, and then do not forget to invoke superclass' reset function too

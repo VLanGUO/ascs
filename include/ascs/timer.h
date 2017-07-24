@@ -62,14 +62,14 @@ public:
 	typedef const timer_info timer_cinfo;
 	typedef std::vector<timer_info> container_type;
 
-	timer(asio::io_service& _io_service_) : object(_io_service_), timer_can(256) {tid id = -1; do_something_to_all([&id](timer_info& item) {item.id = ++id;});}
+	timer(asio::io_context& io_context_) : object(io_context_), timer_can(256) {tid id = -1; do_something_to_all([&id](timer_info& item) {item.id = ++id;});}
 
 	void update_timer_info(tid id, size_t interval, std::function<bool(tid)>&& call_back, bool start = false)
 	{
 		timer_info& ti = timer_can[id];
 
 		if (timer_info::TIMER_FAKE == ti.status)
-			ti.timer = std::make_shared<timer_type>(io_service_);
+			ti.timer = std::make_shared<timer_type>(io_context_);
 		ti.status = timer_info::TIMER_OK;
 		ti.interval_ms = interval;
 		ti.call_back.swap(call_back);
@@ -142,7 +142,7 @@ protected:
 	container_type timer_can;
 
 private:
-	using object::io_service_;
+	using object::io_context_;
 };
 
 } //namespace

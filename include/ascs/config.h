@@ -172,7 +172,7 @@
  * 2017.7.9		version 1.2.2
  *
  * SPECIAL ATTENTION (incompatible with old editions):
- * No error_code will be presented anymore when call io_service::run, suggest to define macro ASCS_ENHANCED_STABILITY.
+ * No error_code will be presented anymore when call io_context::run, suggest to define macro ASCS_ENHANCED_STABILITY.
  *
  * HIGHLIGHT:
  * Add two demos for concurrent test.
@@ -267,8 +267,8 @@
 
 static_assert(ASIO_VERSION >= 101001, "ascs needs asio 1.10.1 or higher.");
 
-#if ASIO_VERSION >= 101100 && defined(ASIO_NO_DEPRECATED)
-#define io_service io_context
+#if ASIO_VERSION < 101100
+namespace asio {typedef io_service io_context;}
 #endif
 //asio and compiler check
 
@@ -298,7 +298,7 @@ static_assert(ASCS_MAX_MSG_NUM > 0, "message capacity must be bigger than zero."
 //don't write any logs.
 //#define ASCS_NO_UNIFIED_OUT
 
-//if defined, service_pump will catch exceptions for asio::io_service::run().
+//if defined, service_pump will catch exceptions for asio::io_context::run().
 //#define ASCS_ENHANCED_STABILITY
 
 //if defined, asio::steady_timer will be used in ascs::timer, otherwise, asio::system_timer will be used.

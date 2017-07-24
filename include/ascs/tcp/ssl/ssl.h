@@ -111,7 +111,7 @@ private:
 	typedef socket<tcp::client_socket_base<Packer, Unpacker, Socket, InQueue, InContainer, OutQueue, OutContainer>> super;
 
 public:
-	client_socket_base(asio::io_service& io_service_, asio::ssl::context& ctx) : super(io_service_, ctx) {}
+	client_socket_base(asio::io_context& io_context_, asio::ssl::context& ctx) : super(io_context_, ctx) {}
 
 	void disconnect(bool reconnect = false) {force_shutdown(reconnect);}
 #ifdef ASCS_REUSE_SSL_STREAM

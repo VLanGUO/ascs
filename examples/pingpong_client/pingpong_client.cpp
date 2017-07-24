@@ -54,7 +54,7 @@ std::atomic_ushort completed_session_num;
 class echo_socket : public client_socket
 {
 public:
-	echo_socket(asio::io_service& io_service_) : client_socket(io_service_) {}
+	echo_socket(asio::io_context& io_context_) : client_socket(io_context_) {}
 
 	void begin(size_t msg_num, const char* msg, size_t msg_len)
 	{

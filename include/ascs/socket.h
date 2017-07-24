@@ -32,8 +32,8 @@ public:
 	static const tid TIMER_END = TIMER_BEGIN + 10;
 
 protected:
-	socket(asio::io_service& io_service_) : timer(io_service_), next_layer_(io_service_) {first_init();}
-	template<typename Arg> socket(asio::io_service& io_service_, Arg& arg) : timer(io_service_), next_layer_(io_service_, arg) {first_init();}
+	socket(asio::io_context& io_context_) : timer(io_context_), next_layer_(io_context_) {first_init();}
+	template<typename Arg> socket(asio::io_context& io_context_, Arg& arg) : timer(io_context_), next_layer_(io_context_, arg) {first_init();}
 
 	//helper function, just call it in constructor
 	void first_init()

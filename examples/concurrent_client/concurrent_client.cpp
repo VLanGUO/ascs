@@ -27,7 +27,7 @@ using namespace ascs::ext::tcp;
 class echo_socket : public client_socket
 {
 public:
-	echo_socket(asio::io_service& io_service_) : client_socket(io_service_), msg_len(ASCS_MSG_BUFFER_SIZE - ASCS_HEAD_LEN) {unpacker()->stripped(false);}
+	echo_socket(asio::io_context& io_context_) : client_socket(io_context_), msg_len(ASCS_MSG_BUFFER_SIZE - ASCS_HEAD_LEN) {unpacker()->stripped(false);}
 
 	void begin(size_t msg_len_) {msg_len = msg_len_;}
 	void check_delay(float max_delay) {if (is_connected() && last_send_time.elapsed() > max_delay) force_shutdown();}
