@@ -227,6 +227,27 @@
  * Rename tcp::client_base to tcp::multi_client_base, ext::tcp::client to ext::tcp::multi_client, udp::service_base to udp::multi_service_base,
  *  ext::udp::service to ext::udp::multi_service. Old ones are still available, but have became alias.
  *
+ * ===============================================================
+ * 2017.x.x		version 1.2.4
+ *
+ * SPECIAL ATTENTION (incompatible with old editions):
+ *
+ * HIGHLIGHT:
+ *
+ * FIX:
+ * If start the same timer and return false in the timer's call_back, its status will be set to TIMER_CANCELED (the right value should be TIMER_OK).
+ *
+ * ENHANCEMENTS:
+ * During congestion controlling, retry interval can be changed at runtime, you can use this feature for performance tuning,
+ *  see macro ASCS_MSG_HANDLING_INTERVAL_STEP1 and ASCS_MSG_HANDLING_INTERVAL_STEP2 for more details.
+ *
+ * DELETION:
+ *
+ * REFACTORING:
+ *
+ * REPLACEMENTS:
+ * Always use io_context instead of io_service (before asio 1.11, io_context will be a typedef of io_service).
+ *
  */
 
 #ifndef _ASCS_CONFIG_H_
@@ -236,8 +257,8 @@
 # pragma once
 #endif // defined(_MSC_VER) && (_MSC_VER >= 1200)
 
-#define ASCS_VER		10203	//[x]xyyzz -> [x]x.[y]y.[z]z
-#define ASCS_VERSION	"1.2.3"
+#define ASCS_VER		10204	//[x]xyyzz -> [x]x.[y]y.[z]z
+#define ASCS_VERSION	"1.2.4"
 
 //asio and compiler check
 #ifdef _MSC_VER
@@ -273,6 +294,7 @@ namespace asio {typedef io_service io_context;}
 //asio and compiler check
 
 //configurations
+
 #ifndef ASCS_SERVER_IP
 #define ASCS_SERVER_IP			"127.0.0.1"
 #endif
@@ -487,6 +509,24 @@ static_assert(ASCS_HEARTBEAT_MAX_ABSENCE > 0, "heartbeat absence must be bigger 
 
 //#define ASCS_DECREASE_THREAD_AT_RUNTIME
 //enable decreasing service thread at runtime.
+
+#ifndef ASCS_MSG_HANDLING_INTERVAL_STEP1
+#define ASCS_MSG_HANDLING_INTERVAL_STEP1	50 //milliseconds
+#endif
+static_assert(ASCS_MSG_HANDLING_INTERVAL_STEP1 >= 0, "the interval of msg handling step 1 must be bigger than or equal to zero.");
+//msg handling step 1
+//move msg from temp_msg_buffer to recv_msg_buffer (because on_msg return false or macro ASCS_FORCE_TO_USE_MSG_RECV_BUFFER been defined)
+//if above process failed, retry it after ASCS_MSG_HANDLING_INTERVAL_STEP1 milliseconds later.
+//this value can be changed via msg_handling_interval_step1(size_t) at runtime.
+
+#ifndef ASCS_MSG_HANDLING_INTERVAL_STEP2
+#define ASCS_MSG_HANDLING_INTERVAL_STEP2	50 //milliseconds
+#endif
+static_assert(ASCS_MSG_HANDLING_INTERVAL_STEP2 >= 0, "the interval of msg handling step 2 must be bigger than or equal to zero.");
+//msg handling step 2
+//call on_msg_handle, if failed, retry it after ASCS_MSG_HANDLING_INTERVAL_STEP2 milliseconds later.
+//this value can be changed via msg_handling_interval_step2(size_t) at runtime.
+
 //configurations
 
 #endif /* _ASCS_CONFIG_H_ */

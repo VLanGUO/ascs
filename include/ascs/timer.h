@@ -51,18 +51,19 @@ public:
 		enum timer_status {TIMER_FAKE, TIMER_OK, TIMER_CANCELED};
 
 		tid id;
+		unsigned char seq;
 		timer_status status;
 		size_t interval_ms;
 		std::function<bool(tid)> call_back; //return true from call_back to continue the timer, or the timer will stop
 		std::shared_ptr<timer_type> timer;
 
-		timer_info() : id(0), status(TIMER_FAKE), interval_ms(0) {}
+		timer_info() : seq(0), status(TIMER_FAKE), interval_ms(0) {}
 	};
 
 	typedef const timer_info timer_cinfo;
 	typedef std::vector<timer_info> container_type;
 
-	timer(asio::io_context& io_context_) : object(io_context_), timer_can(256) {tid id = -1; do_something_to_all([&id](timer_info& item) {item.id = ++id;});}
+	timer(asio::io_context& io_context_) : object(io_context_), timer_can((tid) -1) {tid id = -1; do_something_to_all([&id](timer_info& item) {item.id = ++id;});}
 
 	void update_timer_info(tid id, size_t interval, std::function<bool(tid)>&& call_back, bool start = false)
 	{
@@ -121,10 +122,16 @@ protected:
 #else
 		ti.timer->expires_from_now(milliseconds(ti.interval_ms));
 #endif
-		ti.timer->async_wait(make_handler_error([this, &ti](const asio::error_code& ec) {
+
+#if (defined(_MSC_VER) && _MSC_VER > 1800) || (defined(__cplusplus) && __cplusplus > 201103L)
+		ti.timer->async_wait(make_handler_error([this, &ti, prev_seq(ti.seq++)](const asio::error_code& ec) {
+#else
+		unsigned char prev_seq = ti.seq++;
+		ti.timer->async_wait(make_handler_error([this, &ti, prev_seq](const asio::error_code& ec) {
+#endif
 			if (!ec && ti.call_back(ti.id) && timer_info::TIMER_OK == ti.status)
 				this->start_timer(ti);
-			else
+			else if (prev_seq == ti.id) //exclude a particular situation--start the same timer in call_back and return false
 				ti.status = timer_info::TIMER_CANCELED;
 		}));
 	}
