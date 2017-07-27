@@ -240,8 +240,10 @@
  * ENHANCEMENTS:
  * During congestion controlling, retry interval can be changed at runtime, you can use this feature for performance tuning,
  *  see macro ASCS_MSG_HANDLING_INTERVAL_STEP1 and ASCS_MSG_HANDLING_INTERVAL_STEP2 for more details.
+ * Avoid decreasing the number of service thread to less than one.
  *
  * DELETION:
+ * Drop useless variables which need macro ASCS_DECREASE_THREAD_AT_RUNTIME to be defined.
  *
  * REFACTORING:
  *
