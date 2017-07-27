@@ -126,7 +126,7 @@ protected:
 #if (defined(_MSC_VER) && _MSC_VER > 1800) || (defined(__cplusplus) && __cplusplus > 201103L)
 		ti.timer->async_wait(make_handler_error([this, &ti, prev_seq(ti.seq++)](const asio::error_code& ec) {
 #else
-		unsigned char prev_seq = ti.seq++;
+		auto prev_seq = ti.seq++;
 		ti.timer->async_wait(make_handler_error([this, &ti, prev_seq](const asio::error_code& ec) {
 #endif
 			if (!ec && ti.call_back(ti.id) && timer_info::TIMER_OK == ti.status)

@@ -60,7 +60,15 @@ public:
 	typedef const object_type object_ctype;
 	typedef std::list<object_type> container_type;
 
-	service_pump() : started(false), real_thread_num(0), del_thread_num(0), del_thread_req(false) {}
+	service_pump() : started(false), real_thread_num(0), del_thread_num(0), del_thread_req(false)
+#ifdef ASCS_AVOID_AUTO_STOP_SERVICE
+#if ASIO_VERSION >= 101100
+		, work(asio::make_work_guard(*this))
+#else
+		, work(std::make_shared<asio::io_service::work>(*this))
+#endif
+#endif
+	{}
 	virtual ~service_pump() {stop_service();}
 
 	object_type find(int id)
@@ -166,13 +174,6 @@ public:
 protected:
 	void do_service(int thread_num)
 	{
-#ifdef ASCS_AVOID_AUTO_STOP_SERVICE
-#if ASIO_VERSION >= 101100
-		work = std::make_shared<asio::executor_work_guard<executor_type>>(get_executor());
-#else
-		work = std::make_shared<asio::io_service::work>(*this);
-#endif
-#endif
 		started = true;
 		unified_out::info_out("service pump started.");
 
@@ -284,7 +285,7 @@ protected:
 
 #ifdef ASCS_AVOID_AUTO_STOP_SERVICE
 #if ASIO_VERSION >= 101100
-	std::shared_ptr<asio::executor_work_guard<executor_type>> work;
+	asio::executor_work_guard<executor_type> work;
 #else
 	std::shared_ptr<asio::io_service::work> work;
 #endif
