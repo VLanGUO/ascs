@@ -72,14 +72,6 @@ class echo_client : public multi_client_base<echo_socket>
 public:
 	echo_client(service_pump& service_pump_) : multi_client_base<echo_socket>(service_pump_) {}
 
-	statistic get_statistic()
-	{
-		statistic stat;
-		do_something_to_all([&stat](object_ctype& item) {stat += item->get_statistic();});
-
-		return stat;
-	}
-
 	void begin(float max_delay, size_t msg_len)
 	{
 		do_something_to_all([msg_len](object_ctype& item) {item->begin(msg_len);});

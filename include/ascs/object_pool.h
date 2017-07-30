@@ -246,6 +246,14 @@ public:
 		return object_type();
 	}
 
+	statistic get_statistic()
+	{
+		statistic stat;
+		do_something_to_all([&stat](object_ctype& item) {stat += item->get_statistic();});
+
+		return stat;
+	}
+
 	void list_all_object() {do_something_to_all([](object_ctype& item) {item->show_info("", "");});}
 
 	//Kick out obsoleted objects

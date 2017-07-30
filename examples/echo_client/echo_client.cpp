@@ -184,14 +184,6 @@ public:
 		return total_recv_bytes;
 	}
 
-	statistic get_statistic()
-	{
-		statistic stat;
-		do_something_to_all([&stat](object_ctype& item) {stat += item->get_statistic();});
-
-		return stat;
-	}
-
 	void clear_status() {do_something_to_all([](object_ctype& item) {item->clear_status();});}
 	void begin(size_t msg_num, size_t msg_len, char msg_fill) {do_something_to_all([=](object_ctype& item) {item->begin(msg_num, msg_len, msg_fill);});}
 
