@@ -101,26 +101,18 @@ protected:
 	{
 		assert(object_ptr && !object_ptr->is_equal_to(-1));
 
-		std::unique_lock<std::mutex> lock(invalid_object_can_mutex);
-		auto iter = std::find_if(std::begin(invalid_object_can), std::end(invalid_object_can), [id](object_ctype& item) {return item->is_equal_to(id);});
-		//cannot use invalid_object_pop(uint_fast64_t), it's too arbitrary
-		if (iter != std::end(invalid_object_can) && (*iter).unique() && (*iter)->obsoleted())
+		auto old_object_ptr = invalid_object_pop(id);
+		if (old_object_ptr)
 		{
-			auto invalid_object_ptr(std::move(*iter));
-			invalid_object_can.erase(iter);
-			lock.unlock();
-
 			assert(!find(id));
 
 			std::lock_guard<std::mutex> lock(object_can_mutex);
 			object_can.erase(object_ptr->id());
 			object_ptr->id(id);
 			object_can.emplace(id, object_ptr); //must succeed
-
-			return invalid_object_ptr;
 		}
 
-		return object_type();
+		return old_object_ptr;
 	}
 
 #if defined(ASCS_REUSE_OBJECT) && !defined(ASCS_RESTORE_OBJECT)
@@ -237,7 +229,7 @@ public:
 	{
 		std::lock_guard<std::mutex> lock(invalid_object_can_mutex);
 		auto iter = std::find_if(std::begin(invalid_object_can), std::end(invalid_object_can), [id](object_ctype& item) {return item->is_equal_to(id);});
-		if (iter != std::end(invalid_object_can))
+		if (iter != std::end(invalid_object_can) && (*iter).unique() && (*iter)->obsoleted())
 		{
 			auto object_ptr(std::move(*iter));
 			invalid_object_can.erase(iter);
