@@ -118,19 +118,11 @@ protected:
 #if defined(ASCS_REUSE_OBJECT) && !defined(ASCS_RESTORE_OBJECT)
 	object_type reuse_object()
 	{
-		std::unique_lock<std::mutex> lock(invalid_object_can_mutex);
-		for (auto iter = std::begin(invalid_object_can); iter != std::end(invalid_object_can); ++iter)
-			if ((*iter).unique() && (*iter)->obsoleted())
-			{
-				auto object_ptr(std::move(*iter));
-				invalid_object_can.erase(iter);
-				lock.unlock();
+		auto object_ptr = invalid_object_pop();
+		if (object_ptr)
+			object_ptr->reset();
 
-				object_ptr->reset();
-				return object_ptr;
-			}
-
-		return object_type();
+		return object_ptr;
 	}
 
 	template<typename Arg>
@@ -235,6 +227,20 @@ public:
 			invalid_object_can.erase(iter);
 			return object_ptr;
 		}
+		return object_type();
+	}
+
+	//this method has linear complexity, please note.
+	object_type invalid_object_pop()
+	{
+		std::unique_lock<std::mutex> lock(invalid_object_can_mutex);
+		for (auto iter = std::begin(invalid_object_can); iter != std::end(invalid_object_can); ++iter)
+			if ((*iter).unique() && (*iter)->obsoleted())
+			{
+				auto object_ptr(std::move(*iter));
+				invalid_object_can.erase(iter);
+				return object_ptr;
+			}
 		return object_type();
 	}
 
