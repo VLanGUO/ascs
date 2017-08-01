@@ -231,6 +231,7 @@
  * 2017.x.x		version 1.2.4
  *
  * SPECIAL ATTENTION (incompatible with old editions):
+ * Function object_pool::invalid_object_pop only pop obsoleted objects with no additional reference.
  *
  * HIGHLIGHT:
  *
@@ -241,6 +242,7 @@
  * During congestion controlling, retry interval can be changed at runtime, you can use this feature for performance tuning,
  *  see macro ASCS_MSG_HANDLING_INTERVAL_STEP1 and ASCS_MSG_HANDLING_INTERVAL_STEP2 for more details.
  * Avoid decreasing the number of service thread to less than one.
+ * Add another overload of function object_pool::invalid_object_pop.
  *
  * DELETION:
  * Drop useless variables which need macro ASCS_DECREASE_THREAD_AT_RUNTIME to be defined.
