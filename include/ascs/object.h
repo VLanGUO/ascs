@@ -34,6 +34,9 @@ public:
 	#if ASIO_VERSION >= 101100
 	template<typename F> void post(F&& handler) {asio::post(io_context_, [unused(this->async_call_indicator), handler(std::move(handler))]() {handler();});}
 	template<typename F> void post(const F& handler) {asio::post(io_context_, [unused(this->async_call_indicator), handler]() {handler();});}
+	//Don't use defer function unless you fully understand asio::defer, which was introduced in asio 1.11
+	template<typename F> void defer(F&& handler) {asio::defer(io_context_, [unused(this->async_call_indicator), handler(std::move(handler))]() {handler();});}
+	template<typename F> void defer(const F& handler) {asio::defer(io_context_, [unused(this->async_call_indicator), handler]() {handler();});}
 	#else
 	template<typename F> void post(F&& handler) {io_context_.post([unused(this->async_call_indicator), handler(std::move(handler))]() {handler();});}
 	template<typename F> void post(const F& handler) {io_context_.post([unused(this->async_call_indicator), handler]() {handler();});}
@@ -49,6 +52,8 @@ public:
 #else
 	#if ASIO_VERSION >= 101100
 	template<typename F> void post(const F& handler) {auto unused(async_call_indicator); asio::post(io_context_, [=]() {handler();});}
+	//Don't use defer function unless you fully understand asio::defer, which was introduced in asio 1.11
+	template<typename F> void defer(const F& handler) {auto unused(async_call_indicator); asio::defer(io_context_, [=]() {handler();});}
 	#else
 	template<typename F> void post(const F& handler) {auto unused(async_call_indicator); io_context_.post([=]() {handler();});}
 	#endif
@@ -68,6 +73,9 @@ protected:
 	#if ASIO_VERSION >= 101100
 	template<typename F> void post(F&& handler) {asio::post(io_context_, std::move(handler));}
 	template<typename F> void post(const F& handler) {asio::post(io_context_, handler);}
+	//Don't use defer function unless you fully understand asio::defer, which was introduced in asio 1.11
+	template<typename F> void defer(F&& handler) {asio::defer(io_context_, std::move(handler));}
+	template<typename F> void defer(const F& handler) {asio::defer(io_context_, handler);}
 	#else
 	template<typename F> void post(F&& handler) {io_context_.post(std::move(handler));}
 	template<typename F> void post(const F& handler) {io_context_.post(handler);}

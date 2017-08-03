@@ -116,7 +116,7 @@ protected:
 		return true;
 	}
 
-	//after how much time(ms), client_socket_base will try to reconnect to the server, negative means give up.
+	//after how much time(ms), client_socket_base will try to reconnect to the server, negative value means give up.
 	virtual int prepare_reconnect(const asio::error_code& ec) {return ASCS_RECONNECT_INTERVAL;}
 	virtual void on_connect() {unified_out::info_out("connecting success.");}
 	virtual void on_unpack_error() {unified_out::info_out("can not unpack msg."); force_shutdown();}

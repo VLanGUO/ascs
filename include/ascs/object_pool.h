@@ -244,16 +244,6 @@ public:
 		return object_type();
 	}
 
-	statistic get_statistic()
-	{
-		statistic stat;
-		do_something_to_all([&stat](object_ctype& item) {stat += item->get_statistic();});
-
-		return stat;
-	}
-
-	void list_all_object() {do_something_to_all([](object_ctype& item) {item->show_info("", "");});}
-
 	//Kick out obsoleted objects
 	//Consider the following assumptions:
 	//1.You didn't invoke del_object in on_recv_error or other places.
@@ -288,7 +278,7 @@ public:
 
 	//free a specific number of objects
 	//if you used object pool(define ASCS_REUSE_OBJECT or ASCS_RESTORE_OBJECT), you can manually call this function to free some objects
-	// after the object pool(invalid_object_size()) goes big enough for memory saving (because the objects in invalid_object_can
+	// after the object pool(invalid_object_size()) gets big enough for memory saving (because the objects in invalid_object_can
 	// are waiting for reusing and will never be freed).
 	//if you don't used object pool, object_pool will invoke this function automatically and periodically, so you don't need to invoke this function exactly
 	//return affected object number.
@@ -313,6 +303,9 @@ public:
 
 		return num_affected;
 	}
+
+	void list_all_object() {do_something_to_all([](object_ctype& item) {item->show_info("", "");});}
+	statistic get_statistic() {statistic stat; do_something_to_all([&](object_ctype& item) {stat += item->get_statistic();}); return stat;}
 
 	template<typename _Predicate> void do_something_to_all(const _Predicate& __pred)
 		{std::lock_guard<std::mutex> lock(object_can_mutex); for (typename container_type::value_type& item : object_can) __pred(item.second);}

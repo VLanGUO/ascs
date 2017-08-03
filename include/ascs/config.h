@@ -242,6 +242,7 @@
  * During congestion controlling, retry interval can be changed at runtime, you can use this feature for performance tuning,
  *  see macro ASCS_MSG_HANDLING_INTERVAL_STEP1 and ASCS_MSG_HANDLING_INTERVAL_STEP2 for more details.
  * Avoid decreasing the number of service thread to less than one.
+ * Add a helper function object_pool::get_statistic.
  * Add another overload of function object_pool::invalid_object_pop.
  *
  * DELETION:
