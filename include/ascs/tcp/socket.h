@@ -223,7 +223,7 @@ private:
 	{
 		if (!ec && bytes_transferred > 0)
 		{
-			this->last_recv_time = time(nullptr);
+			this->stat.last_recv_time = time(nullptr);
 
 			typename Unpacker::container_type temp_msg_can;
 			auto_duration dur(this->stat.unpack_time_sum);
@@ -255,7 +255,7 @@ private:
 	{
 		if (!ec)
 		{
-			this->last_send_time = time(nullptr);
+			this->stat.last_send_time = time(nullptr);
 
 			this->stat.send_byte_sum += bytes_transferred;
 			if (last_send_msg.empty()) //send message with sync mode

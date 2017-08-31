@@ -109,7 +109,7 @@ public:
 protected:
 	virtual bool do_start()
 	{
-		this->last_recv_time = time(nullptr);
+		this->stat.last_recv_time = time(nullptr);
 #if ASCS_HEARTBEAT_INTERVAL > 0
 		this->start_heartbeat(ASCS_HEARTBEAT_INTERVAL);
 #endif
@@ -177,7 +177,7 @@ protected:
 
 	virtual bool on_heartbeat_error()
 	{
-		this->last_recv_time = time(nullptr); //avoid repetitive warnings
+		this->stat.last_recv_time = time(nullptr); //avoid repetitive warnings
 		unified_out::warning_out("%s:%hu is not available", peer_addr.address().to_string().data(), peer_addr.port());
 		return true;
 	}
@@ -208,7 +208,7 @@ private:
 	{
 		if (!ec && bytes_transferred > 0)
 		{
-			this->last_recv_time = time(nullptr);
+			this->stat.last_recv_time = time(nullptr);
 
 			auto msg = this->unpacker_->parse_msg(bytes_transferred);
 			if (!msg.empty())
@@ -231,7 +231,7 @@ private:
 	{
 		if (!ec)
 		{
-			this->last_send_time = time(nullptr);
+			this->stat.last_send_time = time(nullptr);
 
 			this->stat.send_byte_sum += bytes_transferred;
 			++this->stat.send_msg_sum;

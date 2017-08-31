@@ -245,11 +245,13 @@
  * Avoid decreasing the number of service thread to less than one.
  * Add a helper function object_pool::get_statistic.
  * Add another overload of function object_pool::invalid_object_pop.
+ * Introduce asio::defer to object, be careful to use it.
  *
  * DELETION:
  * Drop useless variables which need macro ASCS_DECREASE_THREAD_AT_RUNTIME to be defined.
  *
  * REFACTORING:
+ * Move variable last_send_time and last_recv_time from ascs::socket to ascs::socet::stat (a statistic object).
  *
  * REPLACEMENTS:
  * Always use io_context instead of io_service (before asio 1.11, io_context will be a typedef of io_service).

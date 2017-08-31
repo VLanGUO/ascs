@@ -105,7 +105,6 @@ protected:
 			this->lowest_layer().async_connect(server_addr, this->make_handler_error([this](const asio::error_code& ec) {this->connect_handler(ec);}));
 		else
 		{
-			this->last_recv_time = time(nullptr);
 #if ASCS_HEARTBEAT_INTERVAL > 0
 			this->start_heartbeat(ASCS_HEARTBEAT_INTERVAL);
 #endif
@@ -168,6 +167,7 @@ private:
 		if (!ec)
 		{
 			this->status = super::link_status::CONNECTED;
+			this->stat.last_recv_time = this->stat.establish_time = time(nullptr);
 			on_connect();
 			do_start();
 		}

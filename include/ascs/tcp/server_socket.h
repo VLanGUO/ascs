@@ -80,7 +80,7 @@ protected:
 	virtual bool do_start()
 	{
 		this->status = super::link_status::CONNECTED;
-		this->last_recv_time = time(nullptr);
+		this->stat.last_recv_time = this->stat.establish_time = time(nullptr);
 #if ASCS_HEARTBEAT_INTERVAL > 0
 		this->start_heartbeat(ASCS_HEARTBEAT_INTERVAL);
 #endif
