@@ -57,7 +57,7 @@ public:
 		std::function<bool(tid)> call_back; //return true from call_back to continue the timer, or the timer will stop
 		std::shared_ptr<timer_type> timer;
 
-		timer_info() : seq(0), status(TIMER_FAKE), interval_ms(0) {}
+		timer_info() : seq(-1), status(TIMER_FAKE), interval_ms(0) {}
 	};
 
 	typedef const timer_info timer_cinfo;
@@ -124,14 +124,14 @@ protected:
 #endif
 
 #if (defined(_MSC_VER) && _MSC_VER > 1800) || (defined(__cplusplus) && __cplusplus > 201103L)
-		ti.timer->async_wait(make_handler_error([this, &ti, prev_seq(ti.seq++)](const asio::error_code& ec) {
+		ti.timer->async_wait(make_handler_error([this, &ti, prev_seq(++ti.seq)](const asio::error_code& ec) {
 #else
-		auto prev_seq = ti.seq++;
+		auto prev_seq = ++ti.seq;
 		ti.timer->async_wait(make_handler_error([this, &ti, prev_seq](const asio::error_code& ec) {
 #endif
 			if (!ec && ti.call_back(ti.id) && timer_info::TIMER_OK == ti.status)
 				this->start_timer(ti);
-			else if (prev_seq == ti.id) //exclude a particular situation--start the same timer in call_back and return false
+			else if (prev_seq == ti.seq) //exclude a particular situation--start the same timer in call_back and return false
 				ti.status = timer_info::TIMER_CANCELED;
 		}));
 	}

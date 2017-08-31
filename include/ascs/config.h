@@ -237,6 +237,7 @@
  *
  * FIX:
  * If start the same timer and return false in the timer's call_back, its status will be set to TIMER_CANCELED (the right value should be TIMER_OK).
+ * In old compilers (for example gcc 4.7), std::list::splice needs a non-const iterator as the insert point.
  *
  * ENHANCEMENTS:
  * During congestion controlling, retry interval can be changed at runtime, you can use this feature for performance tuning,
