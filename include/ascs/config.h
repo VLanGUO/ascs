@@ -232,6 +232,7 @@
  *
  * SPECIAL ATTENTION (incompatible with old editions):
  * Function object_pool::invalid_object_pop only pop obsoleted objects with no additional reference.
+ * socket::stat.last_recv_time will not be updated before tcp::socket_base::on_connect anymore.
  *
  * HIGHLIGHT:
  *
@@ -246,12 +247,15 @@
  * Add a helper function object_pool::get_statistic.
  * Add another overload of function object_pool::invalid_object_pop.
  * Introduce asio::defer to object, be careful to use it.
+ * Add link's break time and establish time to the statistic object.
  *
  * DELETION:
  * Drop useless variables which need macro ASCS_DECREASE_THREAD_AT_RUNTIME to be defined.
  *
  * REFACTORING:
  * Move variable last_send_time and last_recv_time from ascs::socket to ascs::socet::stat (a statistic object).
+ * Move common operations in client_socket_base::do_start and server_socket_base::do_start to tcp::socket_base::do_start and socket::do_start.
+ * Move virtual function client_socket_base::on_connect to tcp::socket_base, so server_socket_base will have it too.
  *
  * REPLACEMENTS:
  * Always use io_context instead of io_service (before asio 1.11, io_context will be a typedef of io_service).

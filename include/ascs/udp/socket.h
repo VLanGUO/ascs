@@ -107,17 +107,6 @@ public:
 	void show_info(const char* head, const char* tail) const {unified_out::info_out("%s %s:%hu %s", head, local_addr.address().to_string().data(), local_addr.port(), tail);}
 
 protected:
-	virtual bool do_start()
-	{
-		this->stat.last_recv_time = time(nullptr);
-#if ASCS_HEARTBEAT_INTERVAL > 0
-		this->start_heartbeat(ASCS_HEARTBEAT_INTERVAL);
-#endif
-		do_recv_msg();
-
-		return true;
-	}
-
 	//send message with sync mode
 	//return -1 means error occurred, otherwise the number of bytes been sent
 	size_t do_sync_send_msg(typename Packer::msg_ctype& msg) {return do_sync_send_msg(peer_addr, msg);}

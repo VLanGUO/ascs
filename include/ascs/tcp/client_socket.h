@@ -99,19 +99,11 @@ public:
 	}
 
 protected:
-	virtual bool do_start() //connect or receive
+	virtual bool do_start() //connect
 	{
-		if (!this->is_connected())
-			this->lowest_layer().async_connect(server_addr, this->make_handler_error([this](const asio::error_code& ec) {this->connect_handler(ec);}));
-		else
-		{
-#if ASCS_HEARTBEAT_INTERVAL > 0
-			this->start_heartbeat(ASCS_HEARTBEAT_INTERVAL);
-#endif
-			this->send_msg(); //send buffer may have msgs, send them
-			this->do_recv_msg();
-		}
+		assert(!this->is_connected());
 
+		this->lowest_layer().async_connect(server_addr, this->make_handler_error([this](const asio::error_code& ec) {this->connect_handler(ec);}));
 		return true;
 	}
 
@@ -164,13 +156,8 @@ protected:
 private:
 	void connect_handler(const asio::error_code& ec)
 	{
-		if (!ec)
-		{
-			this->status = super::link_status::CONNECTED;
-			this->stat.last_recv_time = this->stat.establish_time = time(nullptr);
-			on_connect();
-			do_start();
-		}
+		if (!ec) //already started, so cannot call start()
+			super::do_start();
 		else
 			prepare_next_reconnect(ec);
 	}

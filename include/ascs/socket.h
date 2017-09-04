@@ -179,7 +179,18 @@ public:
 	POP_ALL_PENDING_MSG(pop_all_pending_recv_msg, recv_msg_buffer, out_container_type)
 
 protected:
-	virtual bool do_start() = 0;
+	virtual bool do_start()
+	{
+		stat.last_recv_time = time(nullptr);
+#if ASCS_HEARTBEAT_INTERVAL > 0
+		start_heartbeat(ASCS_HEARTBEAT_INTERVAL);
+#endif
+		send_msg(); //send buffer may have msgs, send them
+		do_recv_msg();
+
+		return true;
+	}
+
 	virtual bool do_send_msg() = 0;
 	virtual bool do_send_msg(InMsgType&& msg) = 0;
 	virtual void do_recv_msg() = 0;

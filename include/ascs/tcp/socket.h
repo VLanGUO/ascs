@@ -140,6 +140,15 @@ protected:
 		return ec ? -1 : send_size;
 	}
 
+	virtual bool do_start()
+	{
+		status = link_status::CONNECTED;
+		this->stat.establish_time = time(nullptr);
+
+		on_connect(); //in this virtual function, this->stat.last_recv_time has not been updated, please note
+		return super::do_start();
+	}
+
 	//return false if send buffer is empty
 	virtual bool do_send_msg()
 	{
@@ -194,6 +203,7 @@ protected:
 			this->make_handler_error_size([this](const asio::error_code& ec, size_t bytes_transferred) {this->recv_handler(ec, bytes_transferred);}));
 	}
 
+	virtual void on_connect() {}
 	//msg can not be unpacked
 	//the link is still available, so don't need to shutdown this tcp::socket_base at both client and server endpoint
 	virtual void on_unpack_error() = 0;
