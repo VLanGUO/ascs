@@ -145,11 +145,11 @@ private:
 
 	void handle_handshake(const asio::error_code& ec)
 	{
-		on_handshake(ec);
+		this->on_handshake(ec);
 
 		if (!ec)
 		{
-			authorized_ = true;
+			this->authorized_ = true;
 			super::connect_handler(ec); //return to client_socket_base::connect_handler
 		}
 		else
@@ -209,11 +209,11 @@ protected:
 private:
 	void handle_handshake(const asio::error_code& ec)
 	{
-		on_handshake(ec);
+		this->on_handshake(ec);
 
 		if (!ec)
 		{
-			authorized_ = true;
+			this->authorized_ = true;
 			super::do_start(); //return to server_socket_base::do_start
 		}
 		else
