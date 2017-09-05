@@ -32,17 +32,13 @@ class socket : public Socket
 
 public:
 	template<typename Arg>
-	socket(Arg& arg, asio::ssl::context& ctx) : Socket(arg, ctx), authorized_(false) {}
-
-	virtual void reset() {authorized_ = false;}
-	bool authorized() const {return authorized_;}
+	socket(Arg& arg, asio::ssl::context& ctx) : Socket(arg, ctx) {}
 
 protected:
 	virtual void on_recv_error(const asio::error_code& ec)
 	{
 		if (is_ready())
 		{
-			authorized_ = false;
 #ifndef ASCS_REUSE_SSL_STREAM
 			this->status = Socket::link_status::GRACEFUL_SHUTTING_DOWN;
 			this->show_info("ssl link:", "been shut down.");
@@ -73,7 +69,6 @@ protected:
 			return;
 		}
 
-		authorized_ = false;
 		this->status = Socket::link_status::GRACEFUL_SHUTTING_DOWN;
 
 		if (!sync)
@@ -94,9 +89,6 @@ protected:
 				unified_out::info_out("shutdown ssl link failed (maybe intentionally because of reusing)");
 		}
 	}
-
-protected:
-	volatile bool authorized_;
 };
 
 template <typename Packer, typename Unpacker, typename Socket = asio::ssl::stream<asio::ip::tcp::socket>,
@@ -110,11 +102,8 @@ private:
 public:
 	client_socket_base(asio::io_context& io_context_, asio::ssl::context& ctx) : super(io_context_, ctx) {}
 
-	void disconnect(bool reconnect = false) {force_shutdown(reconnect);}
-#ifdef ASCS_REUSE_SSL_STREAM
-	void force_shutdown(bool reconnect = false) {this->authorized_ = false; super::force_shutdown(reconnect);}
-	void graceful_shutdown(bool reconnect = false, bool sync = true) {this->authorized_ = false; super::graceful_shutdown(reconnect, sync);}
-#else
+#ifndef ASCS_REUSE_SSL_STREAM
+	void disconnect(bool reconnect = false) { force_shutdown(reconnect); }
 	void force_shutdown(bool reconnect = false) {graceful_shutdown(reconnect);}
 	void graceful_shutdown(bool reconnect = false, bool sync = true)
 	{
@@ -147,10 +136,7 @@ private:
 		this->on_handshake(ec);
 
 		if (!ec)
-		{
-			this->authorized_ = true;
 			super::connect_handler(ec); //return to tcp::client_socket_base::connect_handler
-		}
 		else
 			force_shutdown();
 	}
@@ -185,11 +171,8 @@ private:
 public:
 	server_socket_base(Server& server_, asio::ssl::context& ctx) : super(server_, ctx) {}
 
+#ifndef ASCS_REUSE_SSL_STREAM
 	void disconnect() {force_shutdown();}
-#ifdef ASCS_REUSE_SSL_STREAM
-	void force_shutdown() {this->authorized_ = false; super::force_shutdown();}
-	void graceful_shutdown(bool sync = false) {this->authorized_ = false; super::graceful_shutdown(sync);}
-#else
 	void force_shutdown() {graceful_shutdown();} //must with async mode (the default value), because server_base::uninit will call this function
 	void graceful_shutdown(bool sync = false) {this->shutdown_ssl(sync);}
 #endif
@@ -197,8 +180,6 @@ public:
 protected:
 	virtual bool do_start() //intercept tcp::server_socket_base::do_start (to add handshake)
 	{
-		assert(!this->authorized());
-
 		this->next_layer().async_handshake(asio::ssl::stream_base::server, this->make_handler_error([this](const asio::error_code& ec) {this->handle_handshake(ec);}));
 		return true;
 	}
@@ -211,10 +192,7 @@ private:
 		this->on_handshake(ec);
 
 		if (!ec)
-		{
-			this->authorized_ = true;
 			super::do_start(); //return to tcp::server_socket_base::do_start
-		}
 		else
 			this->server.del_socket(this->shared_from_this());
 	}
