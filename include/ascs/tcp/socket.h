@@ -302,7 +302,7 @@ private:
 
 	bool async_shutdown_handler(size_t loop_num)
 	{
-		if (link_status::GRACEFUL_SHUTTING_DOWN == this->status)
+		if (link_status::GRACEFUL_SHUTTING_DOWN == status)
 		{
 			--loop_num;
 			if (loop_num > 0)

@@ -77,7 +77,7 @@ public:
 	}
 
 protected:
-	virtual void on_unpack_error() {unified_out::error_out("can not unpack msg."); this->force_shutdown();}
+	virtual void on_unpack_error() {unified_out::error_out("can not unpack msg."); force_shutdown();}
 	//do not forget to force_shutdown this socket(in del_socket(), there's a force_shutdown() invocation)
 	virtual void on_recv_error(const asio::error_code& ec)
 	{

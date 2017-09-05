@@ -128,7 +128,7 @@ public:
 #endif
 
 protected:
-	virtual void connect_handler(const asio::error_code& ec) //intercept client_socket_base::connect_handler
+	virtual void connect_handler(const asio::error_code& ec) //intercept tcp::client_socket_base::connect_handler
 	{
 		if (!ec)
 			this->next_layer().async_handshake(asio::ssl::stream_base::client, this->make_handler_error([this](const asio::error_code& ec) {this->handle_handshake(ec);}));
@@ -150,7 +150,7 @@ private:
 		if (!ec)
 		{
 			this->authorized_ = true;
-			super::connect_handler(ec); //return to client_socket_base::connect_handler
+			super::connect_handler(ec); //return to tcp::client_socket_base::connect_handler
 		}
 		else
 			force_shutdown();
@@ -196,7 +196,7 @@ public:
 #endif
 
 protected:
-	virtual bool do_start() //intercept server_socket_base::do_start (to add handshake)
+	virtual bool do_start() //intercept tcp::server_socket_base::do_start (to add handshake)
 	{
 		assert(!this->authorized());
 
@@ -214,7 +214,7 @@ private:
 		if (!ec)
 		{
 			this->authorized_ = true;
-			super::do_start(); //return to server_socket_base::do_start
+			super::do_start(); //return to tcp::server_socket_base::do_start
 		}
 		else
 			this->server.del_socket(this->shared_from_this());
