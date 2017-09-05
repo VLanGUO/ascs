@@ -37,7 +37,7 @@ public:
 protected:
 	virtual void on_recv_error(const asio::error_code& ec)
 	{
-		if (is_ready())
+		if (this->is_ready())
 		{
 #ifndef ASCS_REUSE_SSL_STREAM
 			this->status = Socket::link_status::GRACEFUL_SHUTTING_DOWN;
@@ -63,7 +63,7 @@ protected:
 
 	void shutdown_ssl(bool sync = true)
 	{
-		if (!is_ready())
+		if (!this->is_ready())
 		{
 			Socket::force_shutdown();
 			return;
@@ -103,7 +103,7 @@ public:
 	client_socket_base(asio::io_context& io_context_, asio::ssl::context& ctx) : super(io_context_, ctx) {}
 
 #ifndef ASCS_REUSE_SSL_STREAM
-	void disconnect(bool reconnect = false) { force_shutdown(reconnect); }
+	void disconnect(bool reconnect = false) {force_shutdown(reconnect);}
 	void force_shutdown(bool reconnect = false) {graceful_shutdown(reconnect);}
 	void graceful_shutdown(bool reconnect = false, bool sync = true)
 	{
@@ -128,7 +128,7 @@ protected:
 	virtual int prepare_reconnect(const asio::error_code& ec) {return -1;}
 	virtual void on_recv_error(const asio::error_code& ec) {this->need_reconnect = false; super::on_recv_error(ec);}
 #endif
-	virtual void on_unpack_error() {unified_out::info_out("can not unpack msg."); force_shutdown();}
+	virtual void on_unpack_error() {unified_out::info_out("can not unpack msg."); this->force_shutdown();}
 
 private:
 	void handle_handshake(const asio::error_code& ec)
@@ -138,7 +138,7 @@ private:
 		if (!ec)
 			super::connect_handler(ec); //return to tcp::client_socket_base::connect_handler
 		else
-			force_shutdown();
+			this->force_shutdown();
 	}
 };
 
@@ -184,7 +184,7 @@ protected:
 		return true;
 	}
 
-	virtual void on_unpack_error() {unified_out::info_out("can not unpack msg."); force_shutdown();}
+	virtual void on_unpack_error() {unified_out::info_out("can not unpack msg."); this->force_shutdown();}
 
 private:
 	void handle_handshake(const asio::error_code& ec)
