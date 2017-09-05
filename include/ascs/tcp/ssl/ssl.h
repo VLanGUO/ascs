@@ -128,13 +128,6 @@ public:
 #endif
 
 protected:
-#ifndef ASCS_REUSE_SSL_STREAM
-	virtual int prepare_reconnect(const asio::error_code& ec) {return -1;}
-	virtual void on_recv_error(const asio::error_code& ec) {this->need_reconnect = false; super::on_recv_error(ec);}
-#endif
-	virtual void on_unpack_error() {unified_out::info_out("can not unpack msg."); force_shutdown();}
-
-private:
 	virtual void connect_handler(const asio::error_code& ec) //intercept client_socket_base::connect_handler
 	{
 		if (!ec)
@@ -143,6 +136,13 @@ private:
 			super::connect_handler(ec);
 	}
 
+#ifndef ASCS_REUSE_SSL_STREAM
+	virtual int prepare_reconnect(const asio::error_code& ec) {return -1;}
+	virtual void on_recv_error(const asio::error_code& ec) {this->need_reconnect = false; super::on_recv_error(ec);}
+#endif
+	virtual void on_unpack_error() {unified_out::info_out("can not unpack msg."); force_shutdown();}
+
+private:
 	void handle_handshake(const asio::error_code& ec)
 	{
 		this->on_handshake(ec);

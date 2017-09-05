@@ -107,6 +107,14 @@ protected:
 		return true;
 	}
 
+	virtual void connect_handler(const asio::error_code& ec)
+	{
+		if (!ec) //already started, so cannot call start()
+			super::do_start();
+		else
+			prepare_next_reconnect(ec);
+	}
+
 	//after how much time(ms), client_socket_base will try to reconnect to the server, negative value means give up.
 	virtual int prepare_reconnect(const asio::error_code& ec) {return ASCS_RECONNECT_INTERVAL;}
 	virtual void on_connect() {unified_out::info_out("connecting success.");}
@@ -151,15 +159,6 @@ protected:
 		}
 
 		return false;
-	}
-
-private:
-	virtual void connect_handler(const asio::error_code& ec)
-	{
-		if (!ec) //already started, so cannot call start()
-			super::do_start();
-		else
-			prepare_next_reconnect(ec);
 	}
 
 protected:
