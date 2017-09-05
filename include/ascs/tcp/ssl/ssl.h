@@ -66,8 +66,6 @@ protected:
 			unified_out::error_out("handshake failed: %s", ec.message().data());
 	}
 
-	void handle_handshake(const asio::error_code& ec) {on_handshake(ec); if (!ec) {authorized_ = true; Socket::do_start();}}
-
 	void shutdown_ssl(bool sync = true)
 	{
 		if (!is_ready())
@@ -130,16 +128,6 @@ public:
 #endif
 
 protected:
-	virtual bool do_start() //add handshake
-	{
-		if (!this->is_connected())
-			super::do_start();
-		else if (!this->authorized())
-			this->next_layer().async_handshake(asio::ssl::stream_base::client, this->make_handler_error([this](const asio::error_code& ec) {this->handle_handshake(ec);}));
-
-		return true;
-	}
-
 #ifndef ASCS_REUSE_SSL_STREAM
 	virtual int prepare_reconnect(const asio::error_code& ec) {return -1;}
 	virtual void on_recv_error(const asio::error_code& ec) {this->need_reconnect = false; super::on_recv_error(ec);}
@@ -147,7 +135,26 @@ protected:
 	virtual void on_unpack_error() {unified_out::info_out("can not unpack msg."); force_shutdown();}
 
 private:
-	void handle_handshake(const asio::error_code& ec) {super::handle_handshake(ec); if (ec) force_shutdown();}
+	virtual void connect_handler(const asio::error_code& ec) //intercept client_socket_base::connect_handler
+	{
+		if (!ec)
+			this->next_layer().async_handshake(asio::ssl::stream_base::client, this->make_handler_error([this](const asio::error_code& ec) {this->handle_handshake(ec);}));
+		else
+			super::connect_handler(ec);
+	}
+
+	void handle_handshake(const asio::error_code& ec)
+	{
+		on_handshake(ec);
+
+		if (!ec)
+		{
+			authorized_ = true;
+			super::connect_handler(ec); //return to client_socket_base::connect_handler
+		}
+		else
+			force_shutdown();
+	}
 };
 
 template<typename Object>
@@ -189,18 +196,29 @@ public:
 #endif
 
 protected:
-	virtual bool do_start() //add handshake
+	virtual bool do_start() //intercept server_socket_base::do_start (to add handshake)
 	{
-		if (!this->authorized())
-			this->next_layer().async_handshake(asio::ssl::stream_base::server, this->make_handler_error([this](const asio::error_code& ec) {this->handle_handshake(ec);}));
+		assert(!this->authorized());
 
+		this->next_layer().async_handshake(asio::ssl::stream_base::server, this->make_handler_error([this](const asio::error_code& ec) {this->handle_handshake(ec);}));
 		return true;
 	}
 
 	virtual void on_unpack_error() {unified_out::info_out("can not unpack msg."); force_shutdown();}
 
 private:
-	void handle_handshake(const asio::error_code& ec) {super::handle_handshake(ec); if (ec) this->server.del_socket(this->shared_from_this());}
+	void handle_handshake(const asio::error_code& ec)
+	{
+		on_handshake(ec);
+
+		if (!ec)
+		{
+			authorized_ = true;
+			super::do_start(); //return to server_socket_base::do_start
+		}
+		else
+			this->server.del_socket(this->shared_from_this());
+	}
 };
 
 template<typename Socket, typename Pool = object_pool<Socket>, typename Server = tcp::i_server> using server_base = tcp::server_base<Socket, Pool, Server>;

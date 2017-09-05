@@ -154,7 +154,7 @@ protected:
 	}
 
 private:
-	void connect_handler(const asio::error_code& ec)
+	virtual void connect_handler(const asio::error_code& ec)
 	{
 		if (!ec) //already started, so cannot call start()
 			super::do_start();
