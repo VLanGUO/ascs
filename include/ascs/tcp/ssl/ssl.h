@@ -34,7 +34,6 @@ public:
 	template<typename Arg>
 	socket(Arg& arg, asio::ssl::context& ctx) : Socket(arg, ctx), authorized_(false) {}
 
-	virtual bool is_ready() {return authorized_ && Socket::is_ready();}
 	virtual void reset() {authorized_ = false;}
 	bool authorized() const {return authorized_;}
 
