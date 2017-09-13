@@ -54,8 +54,15 @@ protected:
 
 	void reset()
 	{
-		packer_->reset();
+		if (is_timer(TIMER_DELAY_CLOSE))
+		{
+			stop_timer(TIMER_DELAY_CLOSE);
+			on_close();
+			set_async_calling(false);
+		}
+
 		clear_buffer();
+		packer_->reset();
 		sending = false;
 		dispatching = false;
 		congestion_controlling = false;
@@ -258,8 +265,13 @@ protected:
 			stat.break_time = time(nullptr);
 		}
 
-		set_async_calling(true);
-		set_timer(TIMER_DELAY_CLOSE, ASCS_DELAY_CLOSE * 1000 + 50, [this](tid id)->bool {return this->timer_handler(TIMER_DELAY_CLOSE);});
+		if (stopped())
+			on_close();
+		else
+		{
+			set_async_calling(true);
+			set_timer(TIMER_DELAY_CLOSE, ASCS_DELAY_CLOSE * 1000 + 50, [this](tid id)->bool {return this->timer_handler(TIMER_DELAY_CLOSE);});
+		}
 
 		return true;
 	}

@@ -45,7 +45,7 @@ protected:
 			asio::error_code ec;
 			this->next_layer().shutdown(ec);
 
-			if (ec && asio::error::eof != ec) //the endpoint who initiated a shutdown will get error eof.
+			if (ec && asio::error::eof != ec) //the endpoint who initiated a shutdown operation will get error eof.
 				unified_out::info_out("shutdown ssl link failed (maybe intentionally because of reusing)");
 #endif
 		}
@@ -75,7 +75,7 @@ protected:
 		{
 			this->show_info("ssl link:", "been shutting down.");
 			this->next_layer().async_shutdown(this->make_handler_error([this](const asio::error_code& ec) {
-				if (ec && asio::error::eof != ec) //the endpoint who initiated a shutdown will get error eof.
+				if (ec && asio::error::eof != ec) //the endpoint who initiated a shutdown operation will get error eof.
 					unified_out::info_out("async shutdown ssl link failed (maybe intentionally because of reusing)");
 			}));
 		}
@@ -85,7 +85,7 @@ protected:
 			asio::error_code ec;
 			this->next_layer().shutdown(ec);
 
-			if (ec && asio::error::eof != ec) //the endpoint who initiated a shutdown will get error eof.
+			if (ec && asio::error::eof != ec) //the endpoint who initiated a shutdown operation will get error eof.
 				unified_out::info_out("shutdown ssl link failed (maybe intentionally because of reusing)");
 		}
 	}

@@ -228,7 +228,7 @@
  *  ext::udp::service to ext::udp::multi_service. Old ones are still available, but have became alias.
  *
  * ===============================================================
- * 2017.x.x		version 1.2.4
+ * 2017.9.17	version 1.2.4
  *
  * SPECIAL ATTENTION (incompatible with old editions):
  * Function object_pool::invalid_object_pop only pop obsoleted objects with no additional reference.
@@ -240,6 +240,8 @@
  * FIX:
  * If start the same timer and return false in the timer's call_back, its status will be set to TIMER_CANCELED (the right value should be TIMER_OK).
  * In old compilers (for example gcc 4.7), std::list::splice needs a non-const iterator as the insert point.
+ * If call stop_service after service_pump stopped, timer TIMER_DELAY_CLOSE will be left behind and be triggered after the next start_service,
+ *  this will bring disorders to ascs::socket.
  *
  * ENHANCEMENTS:
  * During congestion controlling, retry interval can be changed at runtime, you can use this feature for performance tuning,
