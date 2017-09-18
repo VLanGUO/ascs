@@ -54,9 +54,10 @@ protected:
 
 	void reset()
 	{
-		if (is_timer(TIMER_DELAY_CLOSE))
+		auto need_clean_up = is_timer(TIMER_DELAY_CLOSE);
+		stop_all_timer(); //just in case, theoretically, timer TIMER_DELAY_CLOSE and TIMER_ASYNC_SHUTDOWN (used by tcp::socket_base) can left behind.
+		if (need_clean_up)
 		{
-			stop_timer(TIMER_DELAY_CLOSE);
 			on_close();
 			set_async_calling(false);
 		}
