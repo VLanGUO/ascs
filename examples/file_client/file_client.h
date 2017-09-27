@@ -215,14 +215,14 @@ private:
 				printf("\r%u%%", new_percent);
 				fflush(stdout);
 
-				this->update_timer_info(id, 50, [new_percent, this](tid id)->bool {return this->update_progress_handler(id, new_percent); });
+				update_timer_info(id, 50, [new_percent, this](tid id)->bool {return this->update_progress_handler(id, new_percent); });
 			}
 		}
 
 		if (received_size < file_size)
 			return true;
 
-		printf("\r100%\nend, speed: %f MBps.\n", file_size / begin_time.elapsed() / 1024 / 1024);
+		printf("\r100%%\nend, speed: %f MBps.\n", file_size / begin_time.elapsed() / 1024 / 1024);
 		return false;
 	}
 
