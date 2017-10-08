@@ -140,7 +140,7 @@ protected:
 	{
 		if (timer_info::TIMER_OK == ti.status) //enable stopping timers that has been stopped
 		{
-			try {ti.timer->cancel();} catch (const asio::system_error& e) {}
+			try {ti.timer->cancel();} catch (const asio::system_error& e) {unified_out::error_out("cannot stop timer %d (%d %s)", ti.id, e.code().value(), e.what());}
 			ti.status = timer_info::TIMER_CANCELED;
 		}
 	}
