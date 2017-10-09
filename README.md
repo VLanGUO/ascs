@@ -2,15 +2,19 @@ ascs (a successor of st_asio_wrapper)
 ===============
 Overview
 -
-ascs is an asynchronous c/s framework based on Asio(non-Boost), besides all benefits brought by Asio, it also contains: </br>
+ascs is an asynchronous c/s framework based on Asio(non-Boost edition, http://think-async.com/), besides all benefits brought by Asio, it also contains: </br>
 1. Based on message just like UDP with several couple of build-in packer and unpacker;</br>
 2. Support packer and unpacker customization, and replacing packer and unpacker at run-time;</br>
 3. Automatically reconnect to the server after link broken;</br>
-4. Widely support timers;</br>
-5. Support object pool, object reusing;</br>
+4. Support object pool, object reusing and restoration;</br>
+5. Worker thread management; </br>
 6. Support message buffer;</br>
-7. Support ssl;</br>
-8. Support TCP/UDP.</br>
+7. Widely support timers;</br>
+8. Support TCP/UDP;</br>
+9. Support ssl;</br>
+10. Can work alone or with Boost.</br>
+Suggest using ascs if c++0x or higher is available (even you used Boost, but not Boost.Asio), otherwise st_asio_wrapper.
+And Asio(non-Boost edition) needs macro ASIO_STANDALONE to be defined, please note.
 
 Quick start:
 -
