@@ -20,11 +20,11 @@ Quick start:
 -
 ### server:
 Derive your own socket from `server_socket_base`, you must at least re-write the `on_msg` or `on_msg_handle` virtual function and handle messages in it;</br>
-Create a `service_pump` object, create a `server_base` object, call `service_pump::start_service`;</br>
+Create a `service_pump` object, create a `server_base<your_socket>` object, call `service_pump::start_service`;</br>
 Call `server_socket_base::send_msg` when you have messages need to send.</br>
 ### client:
 Derive your own socket from `client_socket_base`, you must at least re-write the `on_msg` or `on_msg_handle` virtual function and handle messages in it;</br>
-Create a `service_pump` object, create a `tcp::client_base` object, set server address via `client_socket_base::set_server_addr`, call `service_pump::start_service`;</br>
+Create a `service_pump` object, create a `multi_client_base<your_socket>` object, add some socket via `multi_client_base::add_socket`, call `service_pump::start_service`;</br>
 Call `client_socket_base::send_msg` when you have messages need to send.</br>
 
 Directory structure:
