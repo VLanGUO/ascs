@@ -164,7 +164,7 @@ protected:
 	}
 #endif
 
-	object_type create_object() {return create_object(sp);}
+	object_type create_object() {return create_object(get_service_pump());}
 
 public:
 	//to configure unordered_set(for example, set factor or reserved size), not thread safe, so must be called before service_pump startup.
