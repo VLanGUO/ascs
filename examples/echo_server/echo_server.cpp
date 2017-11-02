@@ -110,7 +110,7 @@ protected:
 	{
 		//the type of tcp::server_socket_base::server now can be controlled by derived class(echo_socket),
 		//which is actually i_echo_server, so, we can invoke i_echo_server::test virtual function.
-		server.test();
+		get_server().test();
 		server_socket_base::on_recv_error(ec);
 	}
 

@@ -15,11 +15,11 @@
 
 #include <asio/ssl.hpp>
 
-#include "../../object_pool.h"
-#include "../client_socket.h"
 #include "../client.h"
-#include "../server_socket.h"
 #include "../server.h"
+#include "../client_socket.h"
+#include "../server_socket.h"
+#include "../../object_pool.h"
 
 namespace ascs { namespace ssl {
 
@@ -194,7 +194,7 @@ private:
 		if (!ec)
 			super::do_start(); //return to tcp::server_socket_base::do_start
 		else
-			this->server.del_socket(this->shared_from_this());
+			this->get_server().del_socket(this->shared_from_this());
 	}
 };
 

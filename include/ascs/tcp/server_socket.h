@@ -77,6 +77,9 @@ public:
 	}
 
 protected:
+	Server& get_server() {return server;}
+	const Server& get_server() const {return server;}
+
 	virtual void on_unpack_error() {unified_out::error_out("can not unpack msg."); force_shutdown();}
 	//do not forget to force_shutdown this socket(in del_socket(), there's a force_shutdown() invocation)
 	virtual void on_recv_error(const asio::error_code& ec)
@@ -94,7 +97,7 @@ protected:
 	virtual void on_async_shutdown_error() {force_shutdown();}
 	virtual bool on_heartbeat_error() {show_info("server link:", "broke unexpectedly."); force_shutdown(); return false;}
 
-protected:
+private:
 	Server& server;
 };
 
